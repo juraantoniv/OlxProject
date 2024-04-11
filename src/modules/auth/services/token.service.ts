@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { TokenConfig } from '../../../common/configs/config.type';
 import { TokenType } from '../../../common/enums/token.enum';
-import { Config } from '../../../configs/config.type';
+import { Config } from '../../../common/configs/config.type';
 import { TokenResponseDto } from '../dto/response/token.responce.dto';
 import { JwtPayload } from '../types/jwt-payload.type';
 

@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { CarsEntity } from '../../database/entities/cars.entity';
 import { IUserData } from '../auth/interfaces/user-data.interface';
 import { CarsListRequestDto } from './dto/request/cars-list-request.dto';
+import { GoodsEntity } from '../../database/entities/goods.entity';
 
 @Injectable()
-export class CarsRepository extends Repository<CarsEntity> {
+export class GoodsRepository extends Repository<GoodsEntity> {
   constructor(private readonly dataSource: DataSource) {
-    super(CarsEntity, dataSource.manager);
+    super(GoodsEntity, dataSource.manager);
   }
 
   public async getList(
     query: CarsListRequestDto,
     userData: IUserData,
-  ): Promise<[CarsEntity[], number]> {
+  ): Promise<[GoodsEntity[], number]> {
     const qb = this.createQueryBuilder('cars');
     qb.leftJoinAndSelect('cars.likes', 'likes');
     qb.leftJoinAndSelect('cars.user', 'user');

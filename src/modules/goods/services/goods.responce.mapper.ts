@@ -1,49 +1,52 @@
 import * as dotenv from 'dotenv';
 import { join } from 'path';
 
-import getConfigs from '../../../configs/configs';
-import { CarsEntity } from '../../../database/entities/cars.entity';
+import getConfigs from '../../../common/configs/configs';
+
 import { CarsListRequestDto } from '../dto/request/cars-list-request.dto';
 import {
   CarList,
   CarListPrem,
   CarsResponseDto,
 } from '../dto/responce/cars.response.dto';
+import { GoodsEntity } from '../../../database/entities/goods.entity';
 
 dotenv.config({ path: './environments/local.env' });
 
 const awsConfig = getConfigs().aws;
 
 export class CarsResponseMapper {
-  public static toResponseDto(carEntity: Partial<CarsEntity>): CarList {
+  public static toResponseDto(GoodsEntity: Partial<GoodsEntity>): CarList {
     return {
-      id: carEntity.id,
-      model: carEntity.model,
-      brand: carEntity.brand,
-      image: `${awsConfig.aws_url}${carEntity.image}`,
-      description: carEntity.description,
-      currency: carEntity?.currency?.map((el) => JSON.parse(el)),
-      currency_type: carEntity.currency_type,
-      likes: carEntity?.likes?.map((el) => el),
+      messages: GoodsEntity.messages.map((el) => el.messages),
+      id: GoodsEntity.id,
+      region: GoodsEntity.region,
+      location: GoodsEntity.location,
+      price: GoodsEntity.price,
+      image: `${awsConfig.aws_url}${GoodsEntity.image}`,
+      description: GoodsEntity.description,
+      currency_type: GoodsEntity.currency_type,
+      likes: GoodsEntity?.likes?.map((el) => el),
     };
   }
   public static toResponseDtoViews(
-    carEntity: Partial<CarsEntity>,
+    GoodsEntity: Partial<GoodsEntity>,
   ): CarListPrem {
     return {
-      id: carEntity.id,
-      model: carEntity.model,
-      brand: carEntity.brand,
-      image: `${awsConfig.aws_url}${carEntity.image}`,
-      description: carEntity.description,
-      currency: carEntity?.currency?.map((el) => JSON.parse(el)),
-      currency_type: carEntity.currency_type,
-      views: carEntity.views,
-      likes: carEntity.likes?.map((el) => el),
+      id: GoodsEntity.id,
+      region: GoodsEntity.region,
+      location: GoodsEntity.location,
+      price: GoodsEntity.price,
+      image: `${awsConfig.aws_url}${GoodsEntity.image}`,
+      description: GoodsEntity.description,
+      messages: GoodsEntity.messages.map((el) => el.messages),
+      currency_type: GoodsEntity.currency_type,
+      views: GoodsEntity.views,
+      likes: GoodsEntity.likes?.map((el) => el),
     };
   }
   public static toResponseManyDto(
-    carEntity: Partial<CarsEntity[]>,
+    carEntity: Partial<GoodsEntity[]>,
     total: number,
     query: CarsListRequestDto,
   ): CarsResponseDto<CarList[]> {
@@ -55,7 +58,7 @@ export class CarsResponseMapper {
     };
   }
   public static PremResponseManyDto(
-    carEntity: Partial<CarsEntity[]>,
+    carEntity: Partial<GoodsEntity[]>,
     total: number,
     query: CarsListRequestDto,
   ): CarsResponseDto<CarListPrem[]> {

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { log } from 'console';
 
 import { TokenConfig } from '../../../common/configs/config.type';
-import { Config } from '../../../configs/config.type';
+import { Config } from '../../../common/configs/config.type';
 import { RedisService } from '../../redis/redis.service';
 import { AUTH_CACHE } from '../costants/costants';
 

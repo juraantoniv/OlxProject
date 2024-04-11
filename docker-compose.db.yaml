@@ -1,25 +1,25 @@
 version: '3.8'
 
 services:
-  cars-2023-postgres:
+  olx-2023-postgres:
     image: postgres:16.1
     ports:
       - '${POSTGRES_PORT}:5432'
     environment:
       POSTGRES_USER: '${POSTGRES_USER:-user}'
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-password}'
-      POSTGRES_DB: '${POSTGRES_DB:-cars-2023}'
+      POSTGRES_DB: '${POSTGRES_DB:-olx-2023}'
     volumes:
-      - cars-2023-api-db:/var/lib/postgresql/cars-2023
+      - olx-2023-api-db:/var/lib/postgresql/olx-2023
 
-  cars-2023-redis:
+  olx-2023-redis:
     image: redis:7.2.3
     ports:
       - '${REDIS_PORT:-6379}:6379'
     command: >
-      --requirepass '${REDIS_PASSWORD:-redispass}'
+      --requirepass '${REDIS_PASSWORD:-pass}'
     restart: unless-stopped
 
 volumes:
-  cars-2023-api-db:
+  olx-2023-api-db:
 

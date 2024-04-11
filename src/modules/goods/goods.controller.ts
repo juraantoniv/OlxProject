@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   Query,
   UploadedFile,
   UseGuards,
@@ -22,27 +23,27 @@ import {
 } from '@nestjs/swagger';
 
 import { ERights } from '../../common/enums/users.rights.enum';
-import { CarsEntity } from '../../database/entities/cars.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RightsDecorator } from '../auth/decorators/user-rights.decorator';
 import { BannedAccessGuard } from '../auth/guards/banned.access.guard';
 import { PremiumAccessGuard } from '../auth/guards/premium.access.guard';
 import { UserAccessGuard } from '../auth/guards/user.access.guard';
 import { IUserData } from '../auth/interfaces/user-data.interface';
-import { CarsService } from './cars.service';
+import { GoodsService } from './goods.service';
 import { ApiFile } from './decorators/api-file.decorator';
 import { CarsListRequestDto } from './dto/request/cars-list-request.dto';
 import { CreateCarDto } from './dto/request/create-car.dto';
 import { UpdateCarDto } from './dto/request/update-car.dto';
-import { CarList } from './dto/responce/cars.response.dto';
+import { GoodsEntity } from '../../database/entities/goods.entity';
+import { SkipAuth } from '../auth/decorators/skip-auth.decorator';
 
-@Controller('cars')
-@ApiTags('Cars')
-export class CarsController {
-  constructor(private readonly carsService: CarsService) {}
+@ApiTags('Goods')
+@Controller('goods')
+export class GoodsController {
+  constructor(private readonly goodsService: GoodsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'post a car by customer' })
+  @ApiOperation({ summary: 'post a good by customer' })
   @RightsDecorator(ERights.Seller, ERights.Admin)
   @UseGuards(UserAccessGuard, PremiumAccessGuard, BannedAccessGuard)
   // @ApiFile('image')
@@ -52,11 +53,11 @@ export class CarsController {
     @Body() createCarDto: CreateCarDto,
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() userData: IUserData,
-  ): Promise<CarsEntity> {
+  ): Promise<GoodsEntity> {
     console.log(file);
     console.log(createCarDto);
     console.log(userData);
-    return await this.carsService.create(createCarDto, file, userData);
+    return await this.goodsService.create(createCarDto, file, userData);
   }
 
   @Get()
@@ -66,7 +67,7 @@ export class CarsController {
     @Query() query: CarsListRequestDto,
     @CurrentUser() userData: IUserData,
   ) {
-    return await this.carsService.findAll(query, userData);
+    return await this.goodsService.findAll(query, userData);
   }
   @UseGuards(BannedAccessGuard)
   @ApiOperation({ summary: 'get a car by id' })
@@ -75,7 +76,7 @@ export class CarsController {
     @Param('id') id: string,
     @CurrentUser() userData: IUserData,
   ) {
-    return await this.carsService.findOne(id, userData);
+    return await this.goodsService.findOne(id, userData);
   }
   @ApiOperation({ summary: 'update users car' })
   @Patch(':id')
@@ -84,29 +85,50 @@ export class CarsController {
     @Body() updateCarDto: UpdateCarDto,
     @CurrentUser() userData: IUserData,
   ) {
-    return await this.carsService.update(id, updateCarDto, userData);
+    return await this.goodsService.update(id, updateCarDto, userData);
   }
 
   @ApiOperation({ summary: 'delete users car' })
   @Delete(':id')
   remove(@Param('id') id: string, @CurrentUser() userData: IUserData) {
-    return this.carsService.remove(id, userData);
+    return this.goodsService.remove(id, userData);
   }
   @Post('like/:id')
   @ApiOperation({ summary: 'like users car' })
   like(@Param('id') id: string, @CurrentUser() userData: IUserData) {
-    return this.carsService.like(id, userData);
+    return this.goodsService.like(id, userData);
   }
   @Delete('like/:id')
   @ApiOperation({ summary: 'dislike users car' })
   dislike(@Param('id') id: string, @CurrentUser() userData: IUserData) {
-    return this.carsService.dislike(id, userData);
+    return this.goodsService.dislike(id, userData);
   }
+  @Post('buy/:id')
   @ApiOperation({ summary: 'create request to manager to buy a car' })
   @RightsDecorator(ERights.Costumer)
   @UseGuards(UserAccessGuard, BannedAccessGuard)
-  @Post('buy/:id')
   buy(@Param('id') id: string, @CurrentUser() userData: IUserData) {
-    return this.carsService.buyCar(id, userData);
+    return this.goodsService.buyCar(id, userData);
+  }
+
+  @Post('favorite/:id')
+  @ApiOperation({ summary: 'add favorite to users list' })
+  @RightsDecorator(ERights.Seller)
+  @UseGuards(UserAccessGuard, BannedAccessGuard)
+  favorite(@Param('id') id: string, @CurrentUser() userData: IUserData) {
+    return this.goodsService.addToFavorite(id, userData);
+  }
+  @Delete('favorite/:id')
+  @ApiOperation({ summary: 'add favorite to users list' })
+  @RightsDecorator(ERights.Seller)
+  @UseGuards(UserAccessGuard, BannedAccessGuard)
+  remove_favorite(@Param('id') id: string, @CurrentUser() userData: IUserData) {
+    return this.goodsService.removeFavorite(id, userData);
+  }
+  @Get('favorite/my')
+  @ApiOperation({ summary: 'get favorite  users list' })
+  @UseGuards(UserAccessGuard, BannedAccessGuard)
+  myFavorites(@CurrentUser() userData: IUserData) {
+    return this.goodsService.favoriteGoods(userData.userId);
   }
 }

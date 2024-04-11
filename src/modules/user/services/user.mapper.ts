@@ -1,4 +1,4 @@
-import getConfigs from '../../../configs/configs';
+import getConfigs from '../../../common/configs/configs';
 import { UserEntity } from '../../../database/entities/user.entity';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: './environments/local.env' });

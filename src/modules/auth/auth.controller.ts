@@ -8,9 +8,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
-import { CreateUserDto } from '../user/dto/request/create-user.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { SkipAuth } from './decorators/skip-auth.decorator';
 import {
@@ -27,6 +31,7 @@ import { TokenResponseDto } from './dto/response/token.responce.dto';
 import { JwtRefreshGuard } from './guards/jwt.refresh.guard';
 import { IUserData } from './interfaces/user-data.interface';
 import { AuthService } from './services/auth.service';
+import { CreateUserDto } from '../user/dto/request/create-user.dto';
 
 @ApiTags('Auth')
 @Controller({ path: 'auth', version: '1' })

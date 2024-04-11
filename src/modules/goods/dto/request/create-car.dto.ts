@@ -1,27 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
-import { Binary } from 'typeorm';
-
-import { ECars } from '../../../../common/enums/cars.enum';
-import { EUserBanned } from '../../../../common/enums/users.rights.enum';
-import { ApiFile } from '../../decorators/api-file.decorator';
+import { IsEnum, IsInt, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateCarDto {
   @IsString()
   @Length(2, 20)
   @Transform(({ value }) => value.trim())
-  model: string;
+  title: string;
 
   @IsString()
   @Length(2, 20)
   // @ApiProperty({ name: 'brand', enum: ECars })
   // @IsEnum(ECars)
   @Transform(({ value }) => value.trim())
-  brand: string;
+  location: string;
 
   @IsString()
-  currency_type: string;
+  @Length(2, 20)
+  // @ApiProperty({ name: 'brand', enum: ECars })
+  // @IsEnum(ECars)
+  @Transform(({ value }) => value.trim())
+  region: string;
 
   @IsString()
   price: string;

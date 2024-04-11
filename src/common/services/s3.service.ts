@@ -8,7 +8,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import process from 'process';
 
-import getConfigs from '../../../src/configs/configs';
+import getConfigs from '../configs/configs';
 
 dotenv.config({ path: './environments/local.env' });
 

@@ -2,18 +2,18 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 import { BaseEntity } from '../../common/entities/base.entities';
 import { TableNameEnum } from '../../common/enums/table.name.enum';
-import { CarsEntity } from './cars.entity';
 import { UserEntity } from './user.entity';
+import { GoodsEntity } from './goods.entity';
 
 @Entity(TableNameEnum.LIKES)
 export class LikeEntity extends BaseEntity {
   @Column()
-  cars_id: string;
-  @ManyToOne(() => CarsEntity, (entity) => entity.likes, {
+  good_id: string;
+  @ManyToOne(() => GoodsEntity, (entity) => entity.likes, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'cars_id' })
-  cars?: CarsEntity;
+  @JoinColumn({ name: 'good_id' })
+  goods?: GoodsEntity;
 
   @Column()
   user_id: string;

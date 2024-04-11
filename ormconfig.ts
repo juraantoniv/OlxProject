@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import * as dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 
-import getConfigs from './src/configs/configs';
+import getConfigs from './src/common/configs/configs';
 
 dotenv.config({ path: './environments/local.env' });
 

@@ -1,15 +1,15 @@
-import { CarsEntity } from '../../../../database/entities/cars.entity';
 import { ViewsEntity } from '../../../../database/entities/views.entity';
 
 export class CarList {
   id: string;
-  model: string;
-  brand: string;
+  location: string;
+  region: string;
   image: string;
+  price: string;
   description: string;
-  currency: Array<any>;
   currency_type: string;
   likes: Array<any>;
+  messages: Array<any>;
 }
 
 export class CarsResponseDto<T> {

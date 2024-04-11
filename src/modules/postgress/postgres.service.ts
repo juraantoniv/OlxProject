@@ -7,13 +7,14 @@ import {
   TypeOrmOptionsFactory,
 } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
 
-import { Config, PostgresConfig } from '../../configs/config.type';
+import { Config, PostgresConfig } from '../../common/configs/config.type';
 
 @Injectable()
 export class PostgresService implements TypeOrmOptionsFactory {
   constructor(private readonly configService: ConfigService<Config>) {}
   createTypeOrmOptions(): TypeOrmModuleOptions {
     const postgresConfig = this.configService.get<PostgresConfig>('postgres');
+    console.log(postgresConfig);
     return {
       type: 'postgres',
       host: postgresConfig.host,

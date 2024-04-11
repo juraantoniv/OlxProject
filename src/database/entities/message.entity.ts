@@ -4,7 +4,6 @@ import { BaseEntity } from '../../common/entities/base.entities';
 import { GoodsEntity } from './goods.entity';
 import { UserEntity } from './user.entity';
 
-
 @Entity(TableNameEnum.MESSEGE)
 export class MessageEntity extends BaseEntity {
   @Column()
@@ -17,6 +16,9 @@ export class MessageEntity extends BaseEntity {
 
   @Column('text', { nullable: true })
   messages: string;
+
+  @Column('boolean', { default: false })
+  read: boolean;
 
   @Column()
   user_id: string;

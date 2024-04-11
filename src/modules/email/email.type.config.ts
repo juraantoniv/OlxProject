@@ -3,7 +3,7 @@ import { MailerOptions } from '@nestjs-modules/mailer/dist/interfaces/mailer-opt
 import * as dotenv from 'dotenv';
 import { join } from 'path';
 
-import getConfigs from '../../configs/configs';
+import getConfigs from '../../common/configs/configs';
 
 dotenv.config({ path: './environments/local.env' });
 

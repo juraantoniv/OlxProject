@@ -3,4 +3,5 @@ export enum TableNameEnum {
   LIKES = 'likes',
   REFRESH_TOKEN = 'refresh-tokens',
   USERS = 'users',
+  MESSEGE='messege'
 }
