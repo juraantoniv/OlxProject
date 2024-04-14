@@ -33,12 +33,15 @@ import { IUserData } from '../interfaces/user-data.interface';
 import { AuthCacheService } from './auth.cache.service';
 import { AuthMapper, AuthMapperWithTokens } from './auth.mapper';
 import { TokenService } from './token.service';
+import { OAuth2Client } from 'google-auth-library';
+``;
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly tokenService: TokenService,
     private readonly authCacheService: AuthCacheService,
+    private readonly oAuth2Client: OAuth2Client,
     private readonly userRepository: UserRepository,
     private readonly refreshRepository: RefreshTokenRepository,
     private readonly s3Serv: S3Service,
@@ -116,7 +119,15 @@ export class AuthService {
 
       await this.deleteTokens(userEntity.id, dto.deviceId);
 
-      const user = await userRepository.findOneBy({ id: userEntity.id });
+      const user = await userRepository.findOne({
+        where: {
+          id: userEntity.id,
+        },
+        relations: {
+          messages: true,
+          sendedMessages: true,
+        },
+      });
 
       const tokens = await this.tokenService.generateAuthTokens({
         userId: user.id,
@@ -131,6 +142,44 @@ export class AuthService {
 
   public async logout(userData: IUserData): Promise<void> {
     await this.deleteTokens(userData.userId, userData.deviceId);
+  }
+
+  public async signInByGoogle(body: {
+    clientId: string;
+    token: string;
+    deviceId: string;
+  }): Promise<AuthUserResponseTokensDto> {
+    const ver = await this.oAuth2Client.verifyIdToken({
+      idToken: body.token,
+    });
+    console.log(ver.getPayload().email);
+    const userEntity = await this.userRepository.findOne({
+      where: { email: ver.getPayload().email },
+      select: { id: true, password: true },
+    });
+
+    if (!userEntity) {
+      throw new UnauthorizedException();
+    }
+    await this.deleteTokens(userEntity.id, body.deviceId);
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userEntity.id,
+      },
+      relations: {
+        messages: true,
+        sendedMessages: true,
+      },
+    });
+
+    const tokens = await this.tokenService.generateAuthTokens({
+      userId: user.id,
+      deviceId: body.deviceId,
+      email: user.email,
+    });
+
+    await this.saveTokens(tokens, user.id, body.deviceId);
+    return AuthMapperWithTokens.toResponseDto(user, tokens);
   }
 
   public async refreshToken(
@@ -240,5 +289,30 @@ export class AuthService {
       this.refreshRepository.saveToken(userId, deviceId, tokens.refreshToken),
       this.authCacheService.saveToken(userId, deviceId, tokens.accessToken),
     ]);
+  }
+
+  public async validateUser(email: string, displayName: string) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { email: email },
+      });
+
+      if (user) {
+        throw new UnauthorizedException('User with email already exist');
+      }
+
+      const newUser = this.userRepository.create({ email, name: displayName });
+      await this.userRepository.save(newUser);
+      return newUser;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  public handlerLogin() {
+    return 'handlerLogin';
+  }
+
+  public handlerRedirect() {
+    return 'handlerRedirect';
   }
 }

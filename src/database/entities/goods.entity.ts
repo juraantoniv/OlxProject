@@ -8,6 +8,7 @@ import { LikeEntity } from './like.entity';
 import { UserEntity } from './user.entity';
 import { ViewsEntity } from './views.entity';
 import { MessageEntity } from './message.entity';
+import { ECategory } from '../../common/enums/category.enum';
 
 @Entity('Goods')
 export class GoodsEntity extends BaseEntity {
@@ -42,6 +43,14 @@ export class GoodsEntity extends BaseEntity {
   })
   @IsEnum(EActive)
   active: EActive;
+
+  @Column({
+    type: 'enum',
+    enum: ECategory,
+    default: ECategory.OTHER,
+  })
+  @IsEnum(ECategory)
+  category: EActive;
 
   @Column('int', { default: 1 })
   check_of_valid: number;

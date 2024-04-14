@@ -5,12 +5,20 @@ export type Config = {
   email: EmailConfig;
   aws: AWSConfig;
   token: TokenConfig;
+  google: GoogleConfig;
 };
 
 export type AppConfig = {
   port: number;
   host: string;
 };
+
+export type GoogleConfig = {
+  client_id: string;
+  client_secret: string;
+  call_back_url: string;
+};
+
 export type EmailConfig = {
   service: string;
   user: string;

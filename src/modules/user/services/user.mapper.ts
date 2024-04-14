@@ -13,6 +13,8 @@ export class UserMapper {
       age: user.age,
       city: user.city,
       role: user.role,
+      messages:user.messages,
+      sendedMessages:user.sendedMessages,
     };
   }
 }

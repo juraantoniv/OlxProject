@@ -12,6 +12,8 @@ import { CreateUserDto } from '../dto/request/create-user.dto';
 import { UpdateUserDto } from '../dto/request/update-user.dto';
 import { UserRepository } from '../user.repository';
 import { UserMapper } from './user.mapper';
+import { GoodsRepository } from '../../goods/goods.repository';
+import { MessageRepository } from '../../../repository/services/message.repository';
 
 @Injectable()
 export class UserService {
@@ -19,6 +21,8 @@ export class UserService {
 
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly goodsRepository: GoodsRepository,
+    private readonly messageRepository: MessageRepository,
     private readonly s3Serv: S3Service,
   ) {}
 
@@ -84,5 +88,22 @@ export class UserService {
       throw new UnprocessableEntityException('User entity not found');
     }
     return user;
+  }
+
+  public async sendMessage(message: string, id: string, userData: IUserData) {
+    const user = await this.findUserByIdOrException(userData.userId);
+    const good = await this.goodsRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    await this.messageRepository.save(
+      this.messageRepository.create({
+        message: message,
+        good_id: good.id,
+        user_id: good.user_id,
+        users_id_massages: user.id,
+      }),
+    );
   }
 }

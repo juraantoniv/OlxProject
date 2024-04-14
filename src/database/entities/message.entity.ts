@@ -15,7 +15,7 @@ export class MessageEntity extends BaseEntity {
   goods?: GoodsEntity;
 
   @Column('text', { nullable: true })
-  messages: string;
+  message: string;
 
   @Column('boolean', { default: false })
   read: boolean;
@@ -27,4 +27,13 @@ export class MessageEntity extends BaseEntity {
   })
   @JoinColumn({ name: 'user_id' })
   user?: UserEntity;
+
+
+  @Column()
+  users_id_massages: string;
+  @ManyToOne(() => UserEntity, (entity) => entity.sendedMessages, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'users_id_massages' })
+  usersMassages?: UserEntity;
 }

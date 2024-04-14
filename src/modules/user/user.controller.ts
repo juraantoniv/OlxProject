@@ -48,4 +48,15 @@ export class UserController {
   public async me(@CurrentUser() userData: IUserData) {
     return await this.userService.me(userData);
   }
+
+  @ApiOperation({ summary: 'send_message' })
+  @ApiBearerAuth()
+  @Post('send_message/:id')
+  public async sendMessage(
+    @CurrentUser() userData: IUserData,
+    @Param('id') id: string,
+    @Body('massage') massage: string,
+  ) {
+    return await this.userService.sendMessage(massage,id,userData);
+  }
 }

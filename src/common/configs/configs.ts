@@ -7,6 +7,11 @@ export default (): Config => ({
     port: parseInt(process.env.APP_PORT) || 3009,
     host: process.env.APP_HOST || '0.0.0.0',
   },
+  google: {
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    call_back_url: process.env.CALL_BACK_URL,
+  },
   postgres: {
     host: process.env.POSTGRES_HOST,
     port: parseInt(process.env.POSTGRES_PORT) || 5432,

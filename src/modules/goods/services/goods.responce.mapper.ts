@@ -18,7 +18,7 @@ const awsConfig = getConfigs().aws;
 export class CarsResponseMapper {
   public static toResponseDto(GoodsEntity: Partial<GoodsEntity>): CarList {
     return {
-      messages: GoodsEntity.messages.map((el) => el.messages),
+      messages: GoodsEntity.messages.map((el) => el.message),
       id: GoodsEntity.id,
       region: GoodsEntity.region,
       location: GoodsEntity.location,
@@ -39,7 +39,7 @@ export class CarsResponseMapper {
       price: GoodsEntity.price,
       image: `${awsConfig.aws_url}${GoodsEntity.image}`,
       description: GoodsEntity.description,
-      messages: GoodsEntity.messages.map((el) => el.messages),
+      messages: GoodsEntity.messages.map((el) => el.message),
       currency_type: GoodsEntity.currency_type,
       views: GoodsEntity.views,
       likes: GoodsEntity.likes?.map((el) => el),

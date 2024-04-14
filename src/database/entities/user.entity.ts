@@ -72,4 +72,7 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => MessageEntity, (entity) => entity.user)
   messages?: MessageEntity[];
+
+  @OneToMany(() => MessageEntity, (entity) => entity.usersMassages)
+  sendedMessages?: MessageEntity[];
 }
