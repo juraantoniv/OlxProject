@@ -1,27 +1,37 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
-export class CarsListRequestDto {
+export class GoodsListRequestDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
   @IsOptional()
-  limit?: number = 5;
+  limit?: number = 10;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(99999)
   @IsOptional()
-  minValue?: number = 4000;
+  minValue?: number;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(99999)
   @IsOptional()
-  maxValue?: number = 1500;
+  maxValue?: number;
+
+  @Type(() => String)
+  @IsString()
+  @IsOptional()
+  search_field?: string;
+
+  @Type(() => String)
+  @IsString()
+  @IsOptional()
+  category?: string;
 
   @Type(() => Number)
   @IsInt()
@@ -35,9 +45,9 @@ export class CarsListRequestDto {
   search?: string;
 
   @IsOptional()
-  @Type(() => String)
-  @IsString()
-  price?: string;
+  @Type(() => Number)
+  @IsInt()
+  price?: number;
 
   @IsOptional()
   @Type(() => String)

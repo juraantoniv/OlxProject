@@ -31,9 +31,9 @@ import { UserAccessGuard } from '../auth/guards/user.access.guard';
 import { IUserData } from '../auth/interfaces/user-data.interface';
 import { GoodsService } from './goods.service';
 import { ApiFile } from './decorators/api-file.decorator';
-import { CarsListRequestDto } from './dto/request/cars-list-request.dto';
-import { CreateCarDto } from './dto/request/create-car.dto';
-import { UpdateCarDto } from './dto/request/update-car.dto';
+import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
+import { CreateGoodDto } from './dto/request/create-good.dto';
+import { UpdateGoodDto } from './dto/request/update-car.dto';
 import { GoodsEntity } from '../../database/entities/goods.entity';
 import { SkipAuth } from '../auth/decorators/skip-auth.decorator';
 
@@ -50,21 +50,21 @@ export class GoodsController {
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   public async create(
-    @Body() createCarDto: CreateCarDto,
+    @Body() createGoodDto: CreateGoodDto,
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() userData: IUserData,
   ): Promise<GoodsEntity> {
     console.log(file);
-    console.log(createCarDto);
+    console.log(createGoodDto);
     console.log(userData);
-    return await this.goodsService.create(createCarDto, file, userData);
+    return await this.goodsService.create(createGoodDto, file, userData);
   }
 
   @Get()
-  @ApiOperation({ summary: 'get all cars' })
+  @ApiOperation({ summary: 'get all goods' })
   @UseGuards(BannedAccessGuard)
   public async findAll(
-    @Query() query: CarsListRequestDto,
+    @Query() query: GoodsListRequestDto,
     @CurrentUser() userData: IUserData,
   ) {
     return await this.goodsService.findAll(query, userData);
@@ -82,10 +82,10 @@ export class GoodsController {
   @Patch(':id')
   public async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateCarDto: UpdateCarDto,
+    @Body() updateGoodDto: UpdateGoodDto,
     @CurrentUser() userData: IUserData,
   ) {
-    return await this.goodsService.update(id, updateCarDto, userData);
+    return await this.goodsService.update(id, updateGoodDto, userData);
   }
 
   @ApiOperation({ summary: 'delete users car' })

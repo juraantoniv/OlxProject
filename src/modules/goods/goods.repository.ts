@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
 import { IUserData } from '../auth/interfaces/user-data.interface';
-import { CarsListRequestDto } from './dto/request/cars-list-request.dto';
+import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
 import { GoodsEntity } from '../../database/entities/goods.entity';
 
 @Injectable()
@@ -12,35 +12,55 @@ export class GoodsRepository extends Repository<GoodsEntity> {
   }
 
   public async getList(
-    query: CarsListRequestDto,
+    query: GoodsListRequestDto,
     userData: IUserData,
   ): Promise<[GoodsEntity[], number]> {
-    const qb = this.createQueryBuilder('cars');
-    qb.leftJoinAndSelect('cars.likes', 'likes');
-    qb.leftJoinAndSelect('cars.user', 'user');
-    qb.leftJoinAndSelect('cars.views', 'views');
-    qb.where('cars.active = :active', { active: 'active' });
+    console.log(query);
+    const qb = this.createQueryBuilder('goods');
+    qb.leftJoinAndSelect('goods.likes', 'likes');
+    qb.leftJoinAndSelect('goods.user', 'user');
+    qb.leftJoinAndSelect('goods.views', 'views');
+    // qb.where('cars.active = :active', { active: 'active' });
+
+    if (query.category) {
+      qb.where('goods.category = :category', { category: query.category });
+    }
+
+    if (query.search_field) {
+      qb.andWhere(
+        'CONCAT(LOWER(goods.region), LOWER(goods.location)) LIKE :search',
+      );
+      qb.setParameter('search', `%${query.search_field.toLowerCase()}%`);
+    }
+
+    if (query.maxValue && query.minValue) {
+      qb.andWhere('goods.price >= :min');
+      qb.andWhere('goods.price < :max').setParameters({
+        max: query.maxValue,
+        min: query.minValue,
+      });
+    }
 
     if (query.search) {
       qb.andWhere(
-        'CONCAT(LOWER(cars.model), LOWER(cars.description), LOWER(cars.brand)) LIKE :search',
+        'CONCAT(LOWER(goods.title), LOWER(goods.description), LOWER(goods.region)) LIKE :search',
       );
       qb.setParameter('search', `%${query.search.toLowerCase()}%`);
     }
     qb.setParameter('myId', userData.userId);
     qb.setParameter('min', query.minValue);
     qb.setParameter('max', query.maxValue);
-    qb.addOrderBy('cars.created', query.ORDER);
+    qb.addOrderBy('goods.price', query.ORDER);
     qb.take(query.limit);
     qb.skip(query.offset);
     return await qb.getManyAndCount();
   }
   public async getById(id: string) {
-    const qb = this.createQueryBuilder('cars');
-    qb.leftJoinAndSelect('cars.views', 'views');
-    qb.leftJoinAndSelect('cars.likes', 'likes', 'likes.cars_id = cars.id');
-    qb.setParameter('carId', id);
-    qb.where('cars.id=:carId');
+    const qb = this.createQueryBuilder('goods');
+    qb.leftJoinAndSelect('goods.views', 'views');
+    qb.leftJoinAndSelect('goods.likes', 'likes', 'likes.goods_id = goodsId.id');
+    qb.setParameter('goodsId', id);
+    qb.where('goods.id=:goodsId');
     return await qb.getOne();
   }
 }

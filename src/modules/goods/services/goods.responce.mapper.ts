@@ -3,7 +3,7 @@ import { join } from 'path';
 
 import getConfigs from '../../../common/configs/configs';
 
-import { CarsListRequestDto } from '../dto/request/cars-list-request.dto';
+import { GoodsListRequestDto } from '../dto/request/goods-list-request.dto';
 import {
   CarList,
   CarListPrem,
@@ -15,14 +15,16 @@ dotenv.config({ path: './environments/local.env' });
 
 const awsConfig = getConfigs().aws;
 
-export class CarsResponseMapper {
+export class GoodsResponseMapper {
   public static toResponseDto(GoodsEntity: Partial<GoodsEntity>): CarList {
     return {
-      messages: GoodsEntity.messages.map((el) => el.message),
       id: GoodsEntity.id,
+      active: GoodsEntity.active,
+      title: GoodsEntity.title,
       region: GoodsEntity.region,
       location: GoodsEntity.location,
       price: GoodsEntity.price,
+      category: GoodsEntity.category,
       image: `${awsConfig.aws_url}${GoodsEntity.image}`,
       description: GoodsEntity.description,
       currency_type: GoodsEntity.currency_type,
@@ -34,24 +36,26 @@ export class CarsResponseMapper {
   ): CarListPrem {
     return {
       id: GoodsEntity.id,
+      title: GoodsEntity.title,
       region: GoodsEntity.region,
       location: GoodsEntity.location,
       price: GoodsEntity.price,
+      active: GoodsEntity.active,
+      category: GoodsEntity.category,
       image: `${awsConfig.aws_url}${GoodsEntity.image}`,
       description: GoodsEntity.description,
-      messages: GoodsEntity.messages.map((el) => el.message),
       currency_type: GoodsEntity.currency_type,
       views: GoodsEntity.views,
-      likes: GoodsEntity.likes?.map((el) => el),
+      likes: GoodsEntity?.likes?.map((el) => el),
     };
   }
   public static toResponseManyDto(
     carEntity: Partial<GoodsEntity[]>,
     total: number,
-    query: CarsListRequestDto,
+    query: GoodsListRequestDto,
   ): CarsResponseDto<CarList[]> {
     return {
-      data: carEntity.map(this.toResponseDto),
+      data: carEntity?.map(this.toResponseDto),
       total: total,
       limit: query.limit,
       offset: query.offset,
@@ -60,10 +64,10 @@ export class CarsResponseMapper {
   public static PremResponseManyDto(
     carEntity: Partial<GoodsEntity[]>,
     total: number,
-    query: CarsListRequestDto,
+    query: GoodsListRequestDto,
   ): CarsResponseDto<CarListPrem[]> {
     return {
-      data: carEntity.map(this.toResponseDtoViews),
+      data: carEntity?.map(this.toResponseDtoViews),
       total: total,
       limit: query.limit,
       offset: query.offset,

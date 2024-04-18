@@ -92,18 +92,23 @@ export class UserService {
 
   public async sendMessage(message: string, id: string, userData: IUserData) {
     const user = await this.findUserByIdOrException(userData.userId);
-    const good = await this.goodsRepository.findOne({
-      where: {
-        id,
-      },
-    });
+
+    if (id === userData.userId) {
+      throw new UnprocessableEntityException('You can send message yourself');
+    }
     await this.messageRepository.save(
       this.messageRepository.create({
         message: message,
-        good_id: good.id,
-        user_id: good.user_id,
+        user_id: id,
         users_id_massages: user.id,
       }),
     );
+  }
+  public async myMessages(userData: IUserData) {
+    const [messages] = await this.messageRepository.messagesUser(
+      userData.userId,
+    );
+    console.log(messages);
+    return messages;
   }
 }

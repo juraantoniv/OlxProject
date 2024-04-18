@@ -5,11 +5,13 @@ export class CarList {
   location: string;
   region: string;
   image: string;
-  price: string;
+  price: number;
+  title: string;
+  active: string;
+  category: string;
   description: string;
   currency_type: string;
   likes: Array<any>;
-  messages: Array<any>;
 }
 
 export class CarsResponseDto<T> {

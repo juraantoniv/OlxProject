@@ -6,14 +6,6 @@ import { UserEntity } from './user.entity';
 
 @Entity(TableNameEnum.MESSEGE)
 export class MessageEntity extends BaseEntity {
-  @Column()
-  good_id: string;
-  @ManyToOne(() => GoodsEntity, (entity) => entity.messages, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'good_id' })
-  goods?: GoodsEntity;
-
   @Column('text', { nullable: true })
   message: string;
 
@@ -21,16 +13,15 @@ export class MessageEntity extends BaseEntity {
   read: boolean;
 
   @Column()
-  user_id: string;
+  user_id: string; //отримувач
   @ManyToOne(() => UserEntity, (entity) => entity.messages, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   user?: UserEntity;
 
-
   @Column()
-  users_id_massages: string;
+  users_id_massages: string; //відправник
   @ManyToOne(() => UserEntity, (entity) => entity.sendedMessages, {
     onDelete: 'CASCADE',
   })

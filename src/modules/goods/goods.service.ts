@@ -11,10 +11,10 @@ import { ViewsRepository } from '../../repository/services/views.repository';
 import { IUserData } from '../auth/interfaces/user-data.interface';
 import { UserRepository } from '../user/user.repository';
 import { GoodsRepository } from './goods.repository';
-import { CarsListRequestDto } from './dto/request/cars-list-request.dto';
-import { CreateCarDto } from './dto/request/create-car.dto';
-import { UpdateCarDto } from './dto/request/update-car.dto';
-import { CarsResponseMapper } from './services/goods.responce.mapper';
+import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
+import { CreateGoodDto } from './dto/request/create-good.dto';
+import { UpdateGoodDto } from './dto/request/update-car.dto';
+import { GoodsResponseMapper } from './services/goods.responce.mapper';
 import { GoodsEntity } from '../../database/entities/goods.entity';
 
 @Injectable()
@@ -28,7 +28,7 @@ export class GoodsService {
     private readonly likeRepository: LikeRepository,
   ) {}
   async create(
-    createCarDto: CreateCarDto,
+    createGoodDto: CreateGoodDto,
     file: Express.Multer.File,
     userData: IUserData,
   ) {
@@ -54,21 +54,30 @@ export class GoodsService {
     //     });
     //   });
     // }
-    const filePath = await this.s3Serv.uploadFile(
-      file,
-      EFileTypes.User,
-      userData.userId,
-    );
+
+    if (file) {
+      const filePath = await this.s3Serv.uploadFile(
+        file,
+        EFileTypes.User,
+        userData.userId,
+      );
+      const user = this.goodsRepository.create({
+        ...createGoodDto,
+        image: filePath,
+        user_id: userData.userId,
+      });
+      return await this.goodsRepository.save(user);
+    }
 
     const user = this.goodsRepository.create({
-      ...createCarDto,
-      image: filePath,
+      ...createGoodDto,
       user_id: userData.userId,
     });
+
     return await this.goodsRepository.save(user);
   }
 
-  public async findAll(query: CarsListRequestDto, userData: IUserData) {
+  public async findAll(query: GoodsListRequestDto, userData: IUserData) {
     const user = await this.userRepository.findOneBy({ id: userData.userId });
 
     const userPremium = user.userPremiumRights;
@@ -78,8 +87,8 @@ export class GoodsService {
         userData,
       );
       return userPremium === EType.Premium
-        ? CarsResponseMapper.PremResponseManyDto(entities, total, query)
-        : CarsResponseMapper.toResponseManyDto(entities, total, query);
+        ? GoodsResponseMapper.PremResponseManyDto(entities, total, query)
+        : GoodsResponseMapper.toResponseManyDto(entities, total, query);
     } catch (e) {
       console.log(e);
     }
@@ -95,24 +104,24 @@ export class GoodsService {
     });
     console.log(car);
     return userPremium === EType.Premium
-      ? CarsResponseMapper.toResponseDtoViews(car)
-      : CarsResponseMapper.toResponseDto(car);
+      ? GoodsResponseMapper.toResponseDtoViews(car)
+      : GoodsResponseMapper.toResponseDto(car);
   }
 
   public async update(
     id: string,
-    updateCarDto: UpdateCarDto,
+    updateGoodDto: UpdateGoodDto,
     userData: IUserData,
   ) {
-    const car = await this.goodsRepository.findOneBy({ id: id });
-    if (car.user_id !== userData.userId) {
+    const good = await this.goodsRepository.findOneBy({ id: id });
+    if (good.user_id !== userData.userId) {
       throw new ForbiddenException('You cant edit a car that not your own');
     }
 
     return await this.goodsRepository.save({
-      ...car,
-      check_of_valid: car.check_of_valid + 1,
-      ...updateCarDto,
+      ...good,
+      check_of_valid: good.check_of_valid + 1,
+      ...updateGoodDto,
     });
   }
 

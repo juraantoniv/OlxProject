@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Length } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsEnum, IsInt, IsString, Length } from 'class-validator';
+import { ECategory } from '../../../../common/enums/category.enum';
 
-export class CreateCarDto {
+export class CreateGoodDto {
   @IsString()
   @Length(2, 20)
   @Transform(({ value }) => value.trim())
@@ -23,7 +23,12 @@ export class CreateCarDto {
   region: string;
 
   @IsString()
-  price: string;
+  @IsEnum(ECategory)
+  category: ECategory;
+
+  @IsInt()
+  @Type(() => Number)
+  price: number;
 
   @IsString()
   description: string;

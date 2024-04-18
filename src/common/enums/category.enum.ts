@@ -4,5 +4,7 @@ export enum ECategory {
   FASHION = 'FASHION',
   PROPERTY = 'PROPERTY',
   ELECTRONICS = 'ELECTRONICS',
+  FOODS = 'FOODS',
   OTHER = 'OTHER',
+  HOME = 'HOME',
 }

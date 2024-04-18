@@ -24,7 +24,7 @@ export class GoodsEntity extends BaseEntity {
   @Column('text')
   region: string;
 
-  @Column('text', { nullable: true })
+  @Column('text', { nullable: true, default: null })
   image: string;
 
   @Column('text', { default: 'UAH' })
@@ -33,8 +33,8 @@ export class GoodsEntity extends BaseEntity {
   @Column('text', { array: true, default: [] })
   favorite: string[];
 
-  @Column('text')
-  price: string;
+  @Column('int')
+  price: number;
 
   @Column({
     type: 'enum',
@@ -50,7 +50,7 @@ export class GoodsEntity extends BaseEntity {
     default: ECategory.OTHER,
   })
   @IsEnum(ECategory)
-  category: EActive;
+  category: ECategory;
 
   @Column('int', { default: 1 })
   check_of_valid: number;
@@ -63,9 +63,6 @@ export class GoodsEntity extends BaseEntity {
 
   @OneToMany(() => LikeEntity, (entity) => entity.goods)
   likes?: LikeEntity[];
-
-  @OneToMany(() => MessageEntity, (entity) => entity.goods)
-  messages?: MessageEntity[];
 
   @OneToMany(() => ViewsEntity, (entity) => entity.good)
   views?: ViewsEntity[];

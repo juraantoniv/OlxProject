@@ -17,6 +17,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { IUserData } from '../auth/interfaces/user-data.interface';
 import { UpdateUserDto } from './dto/request/update-user.dto';
 import { UserService } from './services/user.service';
+import { SkipAuth } from '../auth/decorators/skip-auth.decorator';
 
 @ApiTags('User')
 @Controller('users')
@@ -57,6 +58,13 @@ export class UserController {
     @Param('id') id: string,
     @Body('massage') massage: string,
   ) {
-    return await this.userService.sendMessage(massage,id,userData);
+    return await this.userService.sendMessage(massage, id, userData);
+  }
+
+  @ApiOperation({ summary: 'my_messages' })
+  @ApiBearerAuth()
+  @Post('my_messages')
+  public async myMessages(@CurrentUser() userData: IUserData) {
+    return await this.userService.myMessages(userData);
   }
 }
