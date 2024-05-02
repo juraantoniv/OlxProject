@@ -32,10 +32,16 @@ import { IUserData } from '../auth/interfaces/user-data.interface';
 import { GoodsService } from './goods.service';
 import { ApiFile } from './decorators/api-file.decorator';
 import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
-import { CreateGoodDto } from './dto/request/create-good.dto';
+import { CreateGoodDto, FileUploadDto } from './dto/request/create-good.dto';
 import { UpdateGoodDto } from './dto/request/update-car.dto';
 import { GoodsEntity } from '../../database/entities/goods.entity';
 import { SkipAuth } from '../auth/decorators/skip-auth.decorator';
+import { JwtAccessGuardForAll } from '../auth/guards/jwt.access.for.all.guard';
+import {
+  CarListDto,
+  CarListPremDto,
+  CarsResponseDto,
+} from './dto/responce/cars.response.dto';
 
 @ApiTags('Goods')
 @Controller('goods')
@@ -46,31 +52,33 @@ export class GoodsController {
   @ApiOperation({ summary: 'post a good by customer' })
   @RightsDecorator(ERights.Seller, ERights.Admin)
   @UseGuards(UserAccessGuard, PremiumAccessGuard, BannedAccessGuard)
-  // @ApiFile('image')
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'add good',
+    type: CreateGoodDto,
+  })
   public async create(
     @Body() createGoodDto: CreateGoodDto,
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() userData: IUserData,
   ): Promise<GoodsEntity> {
-    console.log(file);
-    console.log(createGoodDto);
-    console.log(userData);
     return await this.goodsService.create(createGoodDto, file, userData);
   }
 
+  @SkipAuth()
   @Get()
   @ApiOperation({ summary: 'get all goods' })
-  @UseGuards(BannedAccessGuard)
+  @UseGuards(JwtAccessGuardForAll)
   public async findAll(
     @Query() query: GoodsListRequestDto,
     @CurrentUser() userData: IUserData,
   ) {
     return await this.goodsService.findAll(query, userData);
   }
-  @UseGuards(BannedAccessGuard)
-  @ApiOperation({ summary: 'get a car by id' })
+  @SkipAuth()
+  @ApiOperation({ summary: 'get a good by id' })
+  @UseGuards(JwtAccessGuardForAll)
   @Get(':id')
   public async findOne(
     @Param('id') id: string,
@@ -78,6 +86,24 @@ export class GoodsController {
   ) {
     return await this.goodsService.findOne(id, userData);
   }
+
+  @UseGuards(BannedAccessGuard)
+  @ApiOperation({ summary: 'get the user goods' })
+  @Get('user/my')
+  public async getMyGoods(
+    @Query() query: GoodsListRequestDto,
+    @CurrentUser() userData: IUserData,
+  ) {
+    return await this.goodsService.findMyGoods(query, userData);
+  }
+
+  @UseGuards(BannedAccessGuard)
+  @ApiOperation({ summary: 'get a user goods by id' })
+  @Get('user/:id')
+  public async getUserGoodsById(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.goodsService.findUserGoodsById(id);
+  }
+
   @ApiOperation({ summary: 'update users car' })
   @Patch(':id')
   public async update(
@@ -90,17 +116,26 @@ export class GoodsController {
 
   @ApiOperation({ summary: 'delete users car' })
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() userData: IUserData) {
+  remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() userData: IUserData,
+  ) {
     return this.goodsService.remove(id, userData);
   }
   @Post('like/:id')
-  @ApiOperation({ summary: 'like users car' })
-  like(@Param('id') id: string, @CurrentUser() userData: IUserData) {
+  @ApiOperation({ summary: 'like users good' })
+  like(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() userData: IUserData,
+  ) {
     return this.goodsService.like(id, userData);
   }
   @Delete('like/:id')
   @ApiOperation({ summary: 'dislike users car' })
-  dislike(@Param('id') id: string, @CurrentUser() userData: IUserData) {
+  dislike(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() userData: IUserData,
+  ) {
     return this.goodsService.dislike(id, userData);
   }
   @Post('buy/:id')
@@ -113,22 +148,18 @@ export class GoodsController {
 
   @Post('favorite/:id')
   @ApiOperation({ summary: 'add favorite to users list' })
-  @RightsDecorator(ERights.Seller)
   @UseGuards(UserAccessGuard, BannedAccessGuard)
   favorite(@Param('id') id: string, @CurrentUser() userData: IUserData) {
     return this.goodsService.addToFavorite(id, userData);
   }
-  @Delete('favorite/:id')
-  @ApiOperation({ summary: 'add favorite to users list' })
-  @RightsDecorator(ERights.Seller)
-  @UseGuards(UserAccessGuard, BannedAccessGuard)
-  remove_favorite(@Param('id') id: string, @CurrentUser() userData: IUserData) {
-    return this.goodsService.removeFavorite(id, userData);
-  }
+
   @Get('favorite/my')
   @ApiOperation({ summary: 'get favorite  users list' })
   @UseGuards(UserAccessGuard, BannedAccessGuard)
-  myFavorites(@CurrentUser() userData: IUserData) {
-    return this.goodsService.favoriteGoods(userData.userId);
+  myFavorites(
+    @CurrentUser() userData: IUserData,
+    @Query() query: GoodsListRequestDto,
+  ) {
+    return this.goodsService.favoriteGoods(userData.userId, query);
   }
 }

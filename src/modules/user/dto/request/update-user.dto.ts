@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Transform } from 'class-transformer';
 import {
-  IsEmail,
+  IsEnum,
   IsInt,
   IsOptional,
   IsString,
@@ -11,6 +11,7 @@ import {
 } from 'class-validator';
 
 import { CreateUserDto } from './create-user.dto';
+import { EUserBanned } from '../../../../common/enums/users.rights.enum';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
@@ -26,4 +27,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @Min(16)
   @Max(99)
   age: number;
+
+  @IsEnum(EUserBanned)
+  active: EUserBanned;
 }

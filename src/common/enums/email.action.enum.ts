@@ -4,4 +4,5 @@ export enum EEmailAction {
   Change_Advertising,
   Card_Brand,
   Buy,
+  HELP
 }

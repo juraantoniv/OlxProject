@@ -7,6 +7,9 @@ import { UserEntity } from './user.entity';
 @Entity(TableNameEnum.MESSEGE)
 export class MessageEntity extends BaseEntity {
   @Column('text', { nullable: true })
+  title: string;
+
+  @Column('text', { nullable: true })
   message: string;
 
   @Column('boolean', { default: false })

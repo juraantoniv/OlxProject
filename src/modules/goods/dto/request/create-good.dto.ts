@@ -1,6 +1,7 @@
 import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsInt, IsString, Length } from 'class-validator';
 import { ECategory } from '../../../../common/enums/category.enum';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateGoodDto {
   @IsString()
@@ -32,4 +33,12 @@ export class CreateGoodDto {
 
   @IsString()
   description: string;
+
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: Express.Multer.File;
+}
+
+export class FileUploadDto {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: Express.Multer.File;
 }

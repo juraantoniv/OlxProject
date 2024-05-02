@@ -4,7 +4,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 
-import { EUserBanned } from '../../../common/enums/users.rights.enum';
+import { ERights, EUserBanned } from '../../../common/enums/users.rights.enum';
 import { EFileTypes, S3Service } from '../../../common/services/s3.service';
 import { UserEntity } from '../../../database/entities/user.entity';
 import { IUserData } from '../../auth/interfaces/user-data.interface';
@@ -14,6 +14,9 @@ import { UserRepository } from '../user.repository';
 import { UserMapper } from './user.mapper';
 import { GoodsRepository } from '../../goods/goods.repository';
 import { MessageRepository } from '../../../repository/services/message.repository';
+import { MessageEntity } from '../../../database/entities/message.entity';
+import { EmailService } from '../../../common/services/email.service';
+import { EEmailAction } from '../../../common/enums/email.action.enum';
 
 @Injectable()
 export class UserService {
@@ -24,6 +27,7 @@ export class UserService {
     private readonly goodsRepository: GoodsRepository,
     private readonly messageRepository: MessageRepository,
     private readonly s3Serv: S3Service,
+    private readonly emailService: EmailService,
   ) {}
 
   public async create(createUserDto: CreateUserDto, file: Express.Multer.File) {
@@ -46,7 +50,7 @@ export class UserService {
   }
 
   public async findOne(id: string) {
-    return await this.findUserByIdOrException(id);
+    return UserMapper.toResponseDto(await this.findUserByIdOrException(id));
   }
 
   public async update(updateUserDto: UpdateUserDto, userData: IUserData) {
@@ -104,10 +108,29 @@ export class UserService {
       }),
     );
   }
-  public async myMessages(userData: IUserData) {
-    const [messages] = await this.messageRepository.messagesUser(
-      userData.userId,
-    );
+
+  public async help(userData: IUserData, message: string, subject: string) {
+    const customer = await this.findUserByIdOrException(userData.userId);
+
+    const admins = await this.userRepository.find({
+      where: {
+        role: ERights.Admin,
+      },
+    });
+
+    admins.map(async (user) => {
+      await this.emailService.send(user.email, EEmailAction.HELP, {
+        email: customer.email,
+        message,
+        subject,
+      });
+    });
+    return 'Message was send';
+  }
+  public async myMessages(
+    userData: IUserData,
+  ): Promise<{ receiverId: string; messages: MessageEntity[] }[]> {
+    const messages = await this.messageRepository.messagesUser(userData.userId);
     console.log(messages);
     return messages;
   }

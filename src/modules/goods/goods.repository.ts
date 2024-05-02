@@ -15,12 +15,11 @@ export class GoodsRepository extends Repository<GoodsEntity> {
     query: GoodsListRequestDto,
     userData: IUserData,
   ): Promise<[GoodsEntity[], number]> {
-    console.log(query);
     const qb = this.createQueryBuilder('goods');
-    qb.leftJoinAndSelect('goods.likes', 'likes');
     qb.leftJoinAndSelect('goods.user', 'user');
+    qb.leftJoinAndSelect('goods.likes', 'likes');
     qb.leftJoinAndSelect('goods.views', 'views');
-    // qb.where('cars.active = :active', { active: 'active' });
+    // qb.where('goods.active = :active', { active: 'active' });
 
     if (query.category) {
       qb.where('goods.category = :category', { category: query.category });
@@ -47,7 +46,9 @@ export class GoodsRepository extends Repository<GoodsEntity> {
       );
       qb.setParameter('search', `%${query.search.toLowerCase()}%`);
     }
-    qb.setParameter('myId', userData.userId);
+    if (userData) {
+      qb.setParameter('myId', userData.userId);
+    }
     qb.setParameter('min', query.minValue);
     qb.setParameter('max', query.maxValue);
     qb.addOrderBy('goods.price', query.ORDER);
@@ -58,9 +59,19 @@ export class GoodsRepository extends Repository<GoodsEntity> {
   public async getById(id: string) {
     const qb = this.createQueryBuilder('goods');
     qb.leftJoinAndSelect('goods.views', 'views');
-    qb.leftJoinAndSelect('goods.likes', 'likes', 'likes.goods_id = goodsId.id');
+    qb.leftJoinAndSelect('goods.likes', 'likes');
     qb.setParameter('goodsId', id);
     qb.where('goods.id=:goodsId');
     return await qb.getOne();
+  }
+  public async getUsersGoods(id: string, query: GoodsListRequestDto) {
+    const qb = this.createQueryBuilder('goods');
+    qb.where('goods.user_id=:goodsId');
+    qb.setParameter('goodsId', id);
+    return await qb.getManyAndCount();
+  }
+
+  public async getAllGoods() {
+    return await this.find();
   }
 }

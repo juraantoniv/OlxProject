@@ -5,8 +5,8 @@ import getConfigs from '../../../common/configs/configs';
 
 import { GoodsListRequestDto } from '../dto/request/goods-list-request.dto';
 import {
-  CarList,
-  CarListPrem,
+  CarListDto,
+  CarListPremDto,
   CarsResponseDto,
 } from '../dto/responce/cars.response.dto';
 import { GoodsEntity } from '../../../database/entities/goods.entity';
@@ -16,14 +16,16 @@ dotenv.config({ path: './environments/local.env' });
 const awsConfig = getConfigs().aws;
 
 export class GoodsResponseMapper {
-  public static toResponseDto(GoodsEntity: Partial<GoodsEntity>): CarList {
+  public static toResponseDto(GoodsEntity: Partial<GoodsEntity>): CarListDto {
     return {
       id: GoodsEntity.id,
+      user_id: GoodsEntity.user_id,
       active: GoodsEntity.active,
       title: GoodsEntity.title,
       region: GoodsEntity.region,
       location: GoodsEntity.location,
       price: GoodsEntity.price,
+      created: GoodsEntity.created,
       category: GoodsEntity.category,
       image: `${awsConfig.aws_url}${GoodsEntity.image}`,
       description: GoodsEntity.description,
@@ -33,11 +35,13 @@ export class GoodsResponseMapper {
   }
   public static toResponseDtoViews(
     GoodsEntity: Partial<GoodsEntity>,
-  ): CarListPrem {
+  ): CarListPremDto {
     return {
       id: GoodsEntity.id,
+      created: GoodsEntity.created,
       title: GoodsEntity.title,
       region: GoodsEntity.region,
+      user_id: GoodsEntity.user_id,
       location: GoodsEntity.location,
       price: GoodsEntity.price,
       active: GoodsEntity.active,
@@ -53,7 +57,7 @@ export class GoodsResponseMapper {
     carEntity: Partial<GoodsEntity[]>,
     total: number,
     query: GoodsListRequestDto,
-  ): CarsResponseDto<CarList[]> {
+  ): CarsResponseDto {
     return {
       data: carEntity?.map(this.toResponseDto),
       total: total,
@@ -61,11 +65,16 @@ export class GoodsResponseMapper {
       offset: query.offset,
     };
   }
+  public static responseDtoForMany(
+    carEntity: Partial<GoodsEntity[]>,
+  ): CarListDto[] {
+    return carEntity?.map(this.toResponseDto);
+  }
   public static PremResponseManyDto(
     carEntity: Partial<GoodsEntity[]>,
     total: number,
     query: GoodsListRequestDto,
-  ): CarsResponseDto<CarListPrem[]> {
+  ): CarsResponseDto {
     return {
       data: carEntity?.map(this.toResponseDtoViews),
       total: total,

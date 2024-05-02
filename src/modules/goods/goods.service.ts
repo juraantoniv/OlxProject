@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Query } from '@nestjs/common';
 import axios from 'axios';
 
 import { EEmailAction } from '../../common/enums/email.action.enum';
@@ -12,10 +12,11 @@ import { IUserData } from '../auth/interfaces/user-data.interface';
 import { UserRepository } from '../user/user.repository';
 import { GoodsRepository } from './goods.repository';
 import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
-import { CreateGoodDto } from './dto/request/create-good.dto';
+import { CreateGoodDto, FileUploadDto } from './dto/request/create-good.dto';
 import { UpdateGoodDto } from './dto/request/update-car.dto';
 import { GoodsResponseMapper } from './services/goods.responce.mapper';
 import { GoodsEntity } from '../../database/entities/goods.entity';
+import { EActive } from '../../common/enums/valiid.enum';
 
 @Injectable()
 export class GoodsService {
@@ -32,28 +33,9 @@ export class GoodsService {
     file: Express.Multer.File,
     userData: IUserData,
   ) {
-    const course = await axios.get(
-      'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5',
-    );
-
     const currentUser = await this.userRepository.findOneBy({
       id: userData.userId,
     });
-
-    // if (!createCarDto.brand.includes('[BMW, MERCEDES, OPEL]')) {
-    //   const user = await this.userRepository.find({
-    //     where: {
-    //       role: ERights.Admin,
-    //     },
-    //   });
-    //   user.map(async (user) => {
-    //     await this.emailService.send(user.email, EEmailAction.Card_Brand, {
-    //       name: currentUser.name,
-    //       email: currentUser.email,
-    //       model: createCarDto.brand,
-    //     });
-    //   });
-    // }
 
     if (file) {
       const filePath = await this.s3Serv.uploadFile(
@@ -78,6 +60,13 @@ export class GoodsService {
   }
 
   public async findAll(query: GoodsListRequestDto, userData: IUserData) {
+    if (!userData) {
+      const [entities, total] = await this.goodsRepository.getList(
+        query,
+        userData,
+      );
+      return GoodsResponseMapper.toResponseManyDto(entities, total, query);
+    }
     const user = await this.userRepository.findOneBy({ id: userData.userId });
 
     const userPremium = user.userPremiumRights;
@@ -94,18 +83,51 @@ export class GoodsService {
     }
   }
 
+  public async findMyGoods(query: GoodsListRequestDto, userData: IUserData) {
+    const [entities, total] = await this.goodsRepository.getUsersGoods(
+      userData.userId,
+      query,
+    );
+
+    return GoodsResponseMapper.PremResponseManyDto(entities, total, query);
+  }
+  public async findUserGoodsById(id: string) {
+    const goods = await this.goodsRepository.find({
+      where: {
+        user_id: id,
+      },
+    });
+
+    if (!goods) {
+      throw new ForbiddenException('Not found');
+    }
+    return GoodsResponseMapper.responseDtoForMany(goods);
+  }
+
   public async findOne(id: string, userData: IUserData) {
+    if (!userData) {
+      const goodsEntity = await this.goodsRepository.getById(id);
+      return GoodsResponseMapper.toResponseDto(goodsEntity);
+    }
     const user = await this.userRepository.findOneBy({ id: userData.userId });
     const userPremium = user.userPremiumRights;
-    const car = await this.goodsRepository.getById(id);
-    await this.viewsRepository.save({
-      car_id: car.id,
-      user_id: userData.userId,
+    const goods = await this.goodsRepository.findOne({
+      where: {
+        id,
+      },
     });
-    console.log(car);
+
+    await this.viewsRepository.save(
+      this.viewsRepository.create({
+        good_id: goods.id,
+        user_id: userData.userId,
+      }),
+    );
+
+    const goodsEntity = await this.goodsRepository.getById(id);
     return userPremium === EType.Premium
-      ? GoodsResponseMapper.toResponseDtoViews(car)
-      : GoodsResponseMapper.toResponseDto(car);
+      ? GoodsResponseMapper.toResponseDtoViews(goodsEntity)
+      : GoodsResponseMapper.toResponseDto(goodsEntity);
   }
 
   public async update(
@@ -115,11 +137,12 @@ export class GoodsService {
   ) {
     const good = await this.goodsRepository.findOneBy({ id: id });
     if (good.user_id !== userData.userId) {
-      throw new ForbiddenException('You cant edit a car that not your own');
+      throw new ForbiddenException('You cant edit a goods that not your own');
     }
 
     return await this.goodsRepository.save({
       ...good,
+      active: EActive.Nonactive,
       check_of_valid: good.check_of_valid + 1,
       ...updateGoodDto,
     });
@@ -153,7 +176,7 @@ export class GoodsService {
   public async dislike(id: string, userData: IUserData) {
     const { good, user } = await this.findCarAndUser(id, userData.userId);
     if (good.user_id === userData.userId) {
-      throw new ForbiddenException('You cant dislike a car that  your own car');
+      throw new ForbiddenException('You cant dislike a good that  your own ');
     }
 
     const likeEntity = await this.likeRepository.findOneBy({
@@ -197,46 +220,43 @@ export class GoodsService {
 
   public async addToFavorite(id: string, userData: IUserData) {
     const { good, user } = await this.findCarAndUser(id, userData.userId);
+    if (good.user_id === userData.userId) {
+      throw new ForbiddenException('You cant add a car that  your own car');
+    }
 
     if (good.favorite.includes(userData.userId)) {
-      throw new ForbiddenException('You cant add to favorite twice ');
+      console.log('del');
+      await this.goodsRepository.save(
+        this.goodsRepository.create({
+          ...good,
+          favorite: [...good.favorite.filter((el) => el !== userData.userId)],
+        }),
+      );
+      return 'You are removed good from your list';
+    } else {
+      console.log('add');
+      await this.goodsRepository.save(
+        this.goodsRepository.create({
+          ...good,
+          favorite: [...good.favorite, userData.userId],
+        }),
+      );
+      return 'You are add good from your list';
     }
-
-    if (good.user_id === userData.userId) {
-      throw new ForbiddenException('You cant add a car that  your own car');
-    }
-
-    await this.goodsRepository.save(
-      this.goodsRepository.create({
-        ...good,
-        favorite: [...good.favorite, userData.userId],
-      }),
-    );
   }
 
-  public async removeFavorite(id: string, userData: IUserData) {
-    const { good, user } = await this.findCarAndUser(id, userData.userId);
-    if (!good.favorite.includes(userData.userId)) {
-      throw new ForbiddenException('You cant remove to favorite  ');
-    }
-
-    if (good.user_id === userData.userId) {
-      throw new ForbiddenException('You cant add a car that  your own car');
-    }
-
-    await this.goodsRepository.save(
-      this.goodsRepository.create({
-        ...good,
-        favorite: [...good.favorite.filter((el) => el !== userData.userId)],
-      }),
-    );
-  }
-
-  public async favoriteGoods(userId: string) {
-    return await this.goodsRepository
+  public async favoriteGoods(
+    userId: string,
+    @Query() query: GoodsListRequestDto,
+  ) {
+    console.log(userId);
+    const [goods, total] = await this.goodsRepository
       .createQueryBuilder('goods')
       .where('goods.favorite @> ARRAY[:userId]')
       .setParameter('userId', userId)
-      .getMany();
+      .getManyAndCount();
+
+    console.log(goods);
+    return GoodsResponseMapper.toResponseManyDto(goods, total, query);
   }
 }

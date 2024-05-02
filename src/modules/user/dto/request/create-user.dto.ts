@@ -1,9 +1,11 @@
 import { Transform } from 'class-transformer';
 import {
+  IS_UUID,
   IsEmail,
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
   Length,
   Max,
   Min,
@@ -35,4 +37,18 @@ export class CreateUserDto {
   @Length(2, 20)
   @Transform(({ value }) => value.trim())
   city: string;
+}
+
+export class SendMessageDto {
+  @IsString()
+  message: string;
+}
+
+export class SendHelpMessageDto {
+  @IsString()
+  @Transform(({ value }) => value.trim())
+  subject: string;
+
+  @IsString()
+  message: string;
 }

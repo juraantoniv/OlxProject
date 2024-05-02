@@ -22,6 +22,6 @@ import { UserRepository } from '../user/user.repository';
     EmailService,
     ViewsRepository,
   ],
-  exports: [GoodsRepository, EmailService],
+  exports: [GoodsRepository],
 })
 export class GoodsModule {}

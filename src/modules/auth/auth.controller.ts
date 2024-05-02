@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   Param,
   Post,
   UploadedFile,
@@ -12,8 +11,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
-  ApiOperation,
-  ApiTags,
+  ApiOperation, ApiTags,
 } from '@nestjs/swagger';
 
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -23,7 +21,10 @@ import {
   ConfirmPasswordRequestDto,
   RecoveryPasswordRequestDto,
 } from './dto/request/change-password.request.dto';
-import { SignInRequestDto } from './dto/request/sign-in.request.dto';
+import {
+  SignInRequestDto,
+  SingInByGoogleDto,
+} from './dto/request/sign-in.request.dto';
 import {
   AuthUserResponseDto,
   AuthUserResponseTokensDto,
@@ -33,7 +34,8 @@ import { JwtRefreshGuard } from './guards/jwt.refresh.guard';
 import { IUserData } from './interfaces/user-data.interface';
 import { AuthService } from './services/auth.service';
 import { CreateUserDto } from '../user/dto/request/create-user.dto';
-import { GoogleGuard } from './guards/google.guard';
+import { BannedAccessGuard } from './guards/banned.access.guard';
+import { TokensRequestDto } from './dto/request/tokens.request.dto';
 
 @ApiTags('Auth')
 @Controller({ path: 'auth', version: '1' })
@@ -49,13 +51,12 @@ export class AuthController {
     @Body() dto: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<AuthUserResponseDto> {
-    console.log(dto);
-    console.log(file);
     return await this.authService.signUp(dto, file);
   }
 
   @SkipAuth()
   @ApiOperation({ summary: 'Login' })
+  @UseGuards(BannedAccessGuard)
   @Post('sign-in')
   public async signIn(
     @Body() dto: SignInRequestDto,
@@ -67,7 +68,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Login by Google' })
   @Post('sign-in/google')
   public async signGoogle(
-    @Body() body: { clientId: string; token: string; deviceId: string },
+    @Body() body: SingInByGoogleDto,
   ): Promise<AuthUserResponseTokensDto> {
     return await this.authService.signInByGoogle(body);
   }
@@ -86,9 +87,9 @@ export class AuthController {
   @Post('refresh')
   public async updateRefreshToken(
     @CurrentUser() userData: IUserData,
-    @Body('refresh_token') refresh_token: string,
+    @Body() token: TokensRequestDto,
   ): Promise<TokenResponseDto> {
-    return await this.authService.refreshToken(userData, refresh_token);
+    return await this.authService.refreshToken(userData, token.refresh_token);
   }
 
   @ApiBearerAuth()
@@ -116,18 +117,5 @@ export class AuthController {
     @Body() body: ConfirmPasswordRequestDto,
   ): Promise<string> {
     return await this.authService.confirmPassword(token, body);
-  }
-  @SkipAuth()
-  @UseGuards(GoogleGuard)
-  @Get('google/login')
-  handlerLogin() {
-    return this.authService.handlerLogin();
-  }
-
-  @SkipAuth()
-  @UseGuards(GoogleGuard)
-  @Get('google/redirect')
-  handlerRedirect() {
-    return this.authService.handlerRedirect();
   }
 }

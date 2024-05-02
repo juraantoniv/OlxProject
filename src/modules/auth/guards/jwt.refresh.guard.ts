@@ -23,7 +23,6 @@ export class JwtRefreshGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const { refresh_token } = request.body;
 
-    log(refresh_token);
     if (!refresh_token) {
       throw new UnauthorizedException();
     }

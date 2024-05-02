@@ -23,7 +23,10 @@ import {
   ConfirmPasswordRequestDto,
   RecoveryPasswordRequestDto,
 } from '../dto/request/change-password.request.dto';
-import { SignInRequestDto } from '../dto/request/sign-in.request.dto';
+import {
+  SignInRequestDto,
+  SingInByGoogleDto,
+} from '../dto/request/sign-in.request.dto';
 import {
   AuthUserResponseDto,
   AuthUserResponseTokensDto,
@@ -144,15 +147,12 @@ export class AuthService {
     await this.deleteTokens(userData.userId, userData.deviceId);
   }
 
-  public async signInByGoogle(body: {
-    clientId: string;
-    token: string;
-    deviceId: string;
-  }): Promise<AuthUserResponseTokensDto> {
+  public async signInByGoogle(
+    body: SingInByGoogleDto,
+  ): Promise<AuthUserResponseTokensDto> {
     const ver = await this.oAuth2Client.verifyIdToken({
       idToken: body.token,
     });
-    console.log(ver.getPayload().email);
     const userEntity = await this.userRepository.findOne({
       where: { email: ver.getPayload().email },
       select: { id: true, password: true },
@@ -307,12 +307,5 @@ export class AuthService {
     } catch (e) {
       console.log(e);
     }
-  }
-  public handlerLogin() {
-    return 'handlerLogin';
-  }
-
-  public handlerRedirect() {
-    return 'handlerRedirect';
   }
 }

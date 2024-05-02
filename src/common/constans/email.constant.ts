@@ -21,4 +21,8 @@ export const templates = {
     templateName: 'buy_car',
     subject: 'Someone want buy your car',
   },
+  [EEmailAction.HELP]: {
+    templateName: 'help',
+    subject: 'User wants help',
+  },
 };

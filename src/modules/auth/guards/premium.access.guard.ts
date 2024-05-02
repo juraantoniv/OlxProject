@@ -41,7 +41,7 @@ export class PremiumAccessGuard implements CanActivate {
 
     if (goods.goods.length >= 1 && user.userPremiumRights === EType.Default) {
       throw new HttpException(
-        'Access denied , you have to buy premium account to post other car.',
+        'Access denied , you have to buy premium account to post other goods.',
         HttpStatus.FORBIDDEN,
       );
     }
