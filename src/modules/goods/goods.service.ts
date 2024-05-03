@@ -17,6 +17,7 @@ import { UpdateGoodDto } from './dto/request/update-good.dto';
 import { GoodsResponseMapper } from './services/goods.responce.mapper';
 import { GoodsEntity } from '../../database/entities/goods.entity';
 import { EActive } from '../../common/enums/valiid.enum';
+import { StaticsMapper } from './dto/responce/statics.response.dto';
 
 @Injectable()
 export class GoodsService {
@@ -97,7 +98,9 @@ export class GoodsService {
     return GoodsResponseMapper.responseDtoForMany(goods);
   }
   public async findStatics(query: GoodsListRequestDto) {
-    return this.goodsRepository.findStatics(query);
+    return StaticsMapper.toResponseDtoForMany(
+      await this.goodsRepository.findStatics(query),
+    );
   }
 
   public async findOne(id: string, userData: IUserData) {

@@ -78,7 +78,7 @@ export class GoodsRepository extends Repository<GoodsEntity> {
     const qb = this.createQueryBuilder('goods');
     qb.select('goods.region');
     qb.addSelect('SUM(goods.price)', 'sum');
-    qb.select('goods.user_id');
+    qb.groupBy('goods.region');
     return await qb.getRawMany();
   }
 }
