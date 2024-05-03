@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, UnprocessableEntityException } from '@nestjs/common';
 
 import { ERights, EUserBanned } from '../../../common/enums/users.rights.enum';
 import { EFileTypes, S3Service } from '../../../common/services/s3.service';
@@ -80,6 +76,9 @@ export class UserService {
 
   public async remove(id: string) {
     const entity = await this.userRepository.findOneBy({ id });
+    if (entity.role === ERights.Admin) {
+      throw new ForbiddenException("You don't have rights");
+    }
     if (!entity) {
       throw new UnprocessableEntityException('User not found');
     }
@@ -130,8 +129,6 @@ export class UserService {
   public async myMessages(
     userData: IUserData,
   ): Promise<{ receiverId: string; messages: MessageEntity[] }[]> {
-    const messages = await this.messageRepository.messagesUser(userData.userId);
-    console.log(messages);
-    return messages;
+    return await this.messageRepository.messagesUser(userData.userId);
   }
 }

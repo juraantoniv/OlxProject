@@ -14,6 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiHeader,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -53,6 +54,11 @@ export class AdminController {
 
   @ApiBearerAuth()
   @Post('logout')
+  @ApiHeader({
+    name: 'access_token',
+    description: 'pass value of token to header',
+    required: true,
+  })
   @ApiOperation({ summary: 'user logout' })
   public async logout(@CurrentUser() userData: IUserData): Promise<void> {
     await this.authService.logout(userData);

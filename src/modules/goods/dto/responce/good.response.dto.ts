@@ -1,6 +1,6 @@
 import { ViewsEntity } from '../../../../database/entities/views.entity';
 
-export class CarListDto {
+export class GoodListDto {
   id: string;
   location: string;
   region: string;
@@ -16,13 +16,13 @@ export class CarListDto {
   likes: Array<any>;
 }
 
-export class CarsResponseDto {
-  data: Partial<CarListDto[]>;
+export class GoodsResponseDto {
+  data: Partial<GoodListDto[]>;
   total: number;
   limit: number;
   offset: number;
 }
 
-export class CarListPremDto extends CarListDto {
+export class GoodListPremDto extends GoodListDto {
   views: ViewsEntity[];
 }

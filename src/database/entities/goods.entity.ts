@@ -9,6 +9,7 @@ import { UserEntity } from './user.entity';
 import { ViewsEntity } from './views.entity';
 import { MessageEntity } from './message.entity';
 import { ECategory } from '../../common/enums/category.enum';
+import { ERegion } from '../../common/enums/region.enums';
 
 @Entity('Goods')
 export class GoodsEntity extends BaseEntity {
@@ -21,8 +22,8 @@ export class GoodsEntity extends BaseEntity {
   @Column('text')
   location: string;
 
-  @Column('text')
-  region: string;
+  @Column({ type: 'enum', enum: ERegion })
+  region: ERegion;
 
   @Column('text', { nullable: true, default: null })
   image: string;

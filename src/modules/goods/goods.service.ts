@@ -13,7 +13,7 @@ import { UserRepository } from '../user/user.repository';
 import { GoodsRepository } from './goods.repository';
 import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
 import { CreateGoodDto, FileUploadDto } from './dto/request/create-good.dto';
-import { UpdateGoodDto } from './dto/request/update-car.dto';
+import { UpdateGoodDto } from './dto/request/update-good.dto';
 import { GoodsResponseMapper } from './services/goods.responce.mapper';
 import { GoodsEntity } from '../../database/entities/goods.entity';
 import { EActive } from '../../common/enums/valiid.enum';
@@ -33,10 +33,6 @@ export class GoodsService {
     file: Express.Multer.File,
     userData: IUserData,
   ) {
-    const currentUser = await this.userRepository.findOneBy({
-      id: userData.userId,
-    });
-
     if (file) {
       const filePath = await this.s3Serv.uploadFile(
         file,
@@ -70,17 +66,14 @@ export class GoodsService {
     const user = await this.userRepository.findOneBy({ id: userData.userId });
 
     const userPremium = user.userPremiumRights;
-    try {
-      const [entities, total] = await this.goodsRepository.getList(
-        query,
-        userData,
-      );
-      return userPremium === EType.Premium
-        ? GoodsResponseMapper.PremResponseManyDto(entities, total, query)
-        : GoodsResponseMapper.toResponseManyDto(entities, total, query);
-    } catch (e) {
-      console.log(e);
-    }
+
+    const [entities, total] = await this.goodsRepository.getList(
+      query,
+      userData,
+    );
+    return userPremium === EType.Premium
+      ? GoodsResponseMapper.PremResponseManyDto(entities, total, query)
+      : GoodsResponseMapper.toResponseManyDto(entities, total, query);
   }
 
   public async findMyGoods(query: GoodsListRequestDto, userData: IUserData) {
@@ -149,24 +142,20 @@ export class GoodsService {
   }
 
   public async remove(id: string, userData: IUserData) {
-    const { good, user } = await this.findCarAndUser(id, userData.userId);
+    const { good, user } = await this.findGoodAndUser(id, userData.userId);
 
     if (good.user_id !== userData.userId && user.role !== ERights.Admin) {
-      throw new ForbiddenException('You cant delete a car that not your own');
+      throw new ForbiddenException('You cant delete a good that not your own');
     }
 
-    try {
-      await this.s3Serv.deleteFile(good.image);
-      await this.goodsRepository.remove(good);
-    } catch (e) {
-      console.log(e);
-    }
+    await this.s3Serv.deleteFile(good.image);
+    await this.goodsRepository.remove(good);
   }
   public async like(id: string, userData: IUserData) {
-    const { good, user } = await this.findCarAndUser(id, userData.userId);
+    const { good, user } = await this.findGoodAndUser(id, userData.userId);
 
     if (good.user_id === userData.userId) {
-      throw new ForbiddenException('You cant like a car that  your own car');
+      throw new ForbiddenException('You cant like a good that  your own good');
     }
 
     await this.likeRepository.save(
@@ -174,7 +163,7 @@ export class GoodsService {
     );
   }
   public async dislike(id: string, userData: IUserData) {
-    const { good, user } = await this.findCarAndUser(id, userData.userId);
+    const { good, user } = await this.findGoodAndUser(id, userData.userId);
     if (good.user_id === userData.userId) {
       throw new ForbiddenException('You cant dislike a good that  your own ');
     }
@@ -190,8 +179,8 @@ export class GoodsService {
 
     await this.likeRepository.remove(likeEntity);
   }
-  public async buyCar(id: string, userData: IUserData) {
-    const { good, user } = await this.findCarAndUser(id, userData.userId);
+  public async buyGood(id: string, userData: IUserData) {
+    const { good, user } = await this.findGoodAndUser(id, userData.userId);
 
     const users = await this.userRepository.findBy({
       role: ERights.Manager,
@@ -202,15 +191,15 @@ export class GoodsService {
         name: user.name,
         email: user.email,
         city: user.city,
-        brand: good.title,
+        title: good.title,
       });
     });
   }
-  private async findCarAndUser(
-    carId: string,
+  private async findGoodAndUser(
+    goodId: string,
     userId: string,
   ): Promise<{ good: GoodsEntity; user: UserEntity }> {
-    const good = await this.goodsRepository.findOneBy({ id: carId });
+    const good = await this.goodsRepository.findOneBy({ id: goodId });
     const user = await this.userRepository.findOneBy({ id: userId });
     return {
       good,
@@ -219,13 +208,12 @@ export class GoodsService {
   }
 
   public async addToFavorite(id: string, userData: IUserData) {
-    const { good, user } = await this.findCarAndUser(id, userData.userId);
+    const { good, user } = await this.findGoodAndUser(id, userData.userId);
     if (good.user_id === userData.userId) {
-      throw new ForbiddenException('You cant add a car that  your own car');
+      throw new ForbiddenException('You cant add a good that  your own good');
     }
 
     if (good.favorite.includes(userData.userId)) {
-      console.log('del');
       await this.goodsRepository.save(
         this.goodsRepository.create({
           ...good,
@@ -234,7 +222,6 @@ export class GoodsService {
       );
       return 'You are removed good from your list';
     } else {
-      console.log('add');
       await this.goodsRepository.save(
         this.goodsRepository.create({
           ...good,
@@ -249,14 +236,12 @@ export class GoodsService {
     userId: string,
     @Query() query: GoodsListRequestDto,
   ) {
-    console.log(userId);
     const [goods, total] = await this.goodsRepository
       .createQueryBuilder('goods')
       .where('goods.favorite @> ARRAY[:userId]')
       .setParameter('userId', userId)
       .getManyAndCount();
 
-    console.log(goods);
     return GoodsResponseMapper.toResponseManyDto(goods, total, query);
   }
 }

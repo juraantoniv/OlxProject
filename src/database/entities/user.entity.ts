@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 import { BaseEntity } from '../../common/entities/base.entities';
 import {
@@ -27,6 +27,9 @@ export class UserEntity extends BaseEntity {
 
   @Column('int')
   age: number;
+
+  @Column('text', { nullable: true })
+  phone: number;
 
   @Column('text', { nullable: true })
   city: string;

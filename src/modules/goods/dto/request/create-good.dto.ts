@@ -2,6 +2,7 @@ import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsInt, IsString, Length } from 'class-validator';
 import { ECategory } from '../../../../common/enums/category.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import { ERegion } from '../../../../common/enums/region.enums';
 
 export class CreateGoodDto {
   @IsString()
@@ -11,17 +12,15 @@ export class CreateGoodDto {
 
   @IsString()
   @Length(2, 20)
-  // @ApiProperty({ name: 'brand', enum: ECars })
-  // @IsEnum(ECars)
   @Transform(({ value }) => value.trim())
   location: string;
 
   @IsString()
   @Length(2, 20)
-  // @ApiProperty({ name: 'brand', enum: ECars })
-  // @IsEnum(ECars)
+  @ApiProperty({ name: 'region', enum: ERegion })
+  @IsEnum(ERegion)
   @Transform(({ value }) => value.trim())
-  region: string;
+  region: ERegion;
 
   @IsString()
   @IsEnum(ECategory)

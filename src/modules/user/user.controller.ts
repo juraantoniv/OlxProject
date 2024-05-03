@@ -1,14 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiHeader,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -51,6 +44,11 @@ export class UserController {
   }
   @ApiOperation({ summary: 'get me' })
   @ApiBearerAuth()
+  @ApiHeader({
+    name: 'access_token',
+    description: 'pass value of token to header',
+    required: true,
+  })
   @Get('user/me')
   public async me(
     @CurrentUser() userData: IUserData,

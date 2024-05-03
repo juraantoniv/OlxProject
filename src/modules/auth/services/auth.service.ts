@@ -199,7 +199,6 @@ export class AuthService {
     });
 
     await this.saveTokens(tokens, user.id, userData.deviceId);
-    console.log(tokens);
     return tokens;
   }
 
@@ -292,20 +291,16 @@ export class AuthService {
   }
 
   public async validateUser(email: string, displayName: string) {
-    try {
-      const user = await this.userRepository.findOne({
-        where: { email: email },
-      });
+    const user = await this.userRepository.findOne({
+      where: { email: email },
+    });
 
-      if (user) {
-        throw new UnauthorizedException('User with email already exist');
-      }
-
-      const newUser = this.userRepository.create({ email, name: displayName });
-      await this.userRepository.save(newUser);
-      return newUser;
-    } catch (e) {
-      console.log(e);
+    if (user) {
+      throw new UnauthorizedException('User with email already exist');
     }
+
+    const newUser = this.userRepository.create({ email, name: displayName });
+    await this.userRepository.save(newUser);
+    return newUser;
   }
 }

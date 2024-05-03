@@ -1,4 +1,4 @@
-import { LoggerService, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './modules/auth/auth.module';
@@ -9,7 +9,6 @@ import { CustomEmailModule } from './modules/email/email-module';
 import { TasksService } from './common/crons/cron.runner';
 import { CustomConfigModule } from './common/config/config.module';
 import { GoodsModule } from './modules/goods/goods.module';
-import { UserModule } from './modules/user/user.module';
 import { RepositoryModule } from './repository/repository.module';
 import { PassportModule } from '@nestjs/passport';
 

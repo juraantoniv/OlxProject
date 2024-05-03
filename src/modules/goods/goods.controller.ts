@@ -33,15 +33,10 @@ import { GoodsService } from './goods.service';
 import { ApiFile } from './decorators/api-file.decorator';
 import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
 import { CreateGoodDto, FileUploadDto } from './dto/request/create-good.dto';
-import { UpdateGoodDto } from './dto/request/update-car.dto';
+import { UpdateGoodDto } from './dto/request/update-good.dto';
 import { GoodsEntity } from '../../database/entities/goods.entity';
 import { SkipAuth } from '../auth/decorators/skip-auth.decorator';
 import { JwtAccessGuardForAll } from '../auth/guards/jwt.access.for.all.guard';
-import {
-  CarListDto,
-  CarListPremDto,
-  CarsResponseDto,
-} from './dto/responce/cars.response.dto';
 
 @ApiTags('Goods')
 @Controller('goods')
@@ -104,7 +99,7 @@ export class GoodsController {
     return await this.goodsService.findUserGoodsById(id);
   }
 
-  @ApiOperation({ summary: 'update users car' })
+  @ApiOperation({ summary: 'update users good' })
   @Patch(':id')
   public async update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -114,7 +109,7 @@ export class GoodsController {
     return await this.goodsService.update(id, updateGoodDto, userData);
   }
 
-  @ApiOperation({ summary: 'delete users car' })
+  @ApiOperation({ summary: 'delete users good' })
   @Delete(':id')
   remove(
     @Param('id', ParseUUIDPipe) id: string,
@@ -131,7 +126,7 @@ export class GoodsController {
     return this.goodsService.like(id, userData);
   }
   @Delete('like/:id')
-  @ApiOperation({ summary: 'dislike users car' })
+  @ApiOperation({ summary: 'dislike users good' })
   dislike(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() userData: IUserData,
@@ -139,11 +134,11 @@ export class GoodsController {
     return this.goodsService.dislike(id, userData);
   }
   @Post('buy/:id')
-  @ApiOperation({ summary: 'create request to manager to buy a car' })
+  @ApiOperation({ summary: 'create request to manager to buy a good' })
   @RightsDecorator(ERights.Costumer)
   @UseGuards(UserAccessGuard, BannedAccessGuard)
   buy(@Param('id') id: string, @CurrentUser() userData: IUserData) {
-    return this.goodsService.buyCar(id, userData);
+    return this.goodsService.buyGood(id, userData);
   }
 
   @Post('favorite/:id')

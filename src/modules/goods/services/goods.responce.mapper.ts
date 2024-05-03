@@ -5,10 +5,10 @@ import getConfigs from '../../../common/configs/configs';
 
 import { GoodsListRequestDto } from '../dto/request/goods-list-request.dto';
 import {
-  CarListDto,
-  CarListPremDto,
-  CarsResponseDto,
-} from '../dto/responce/cars.response.dto';
+  GoodListDto,
+  GoodListPremDto,
+  GoodsResponseDto,
+} from '../dto/responce/good.response.dto';
 import { GoodsEntity } from '../../../database/entities/goods.entity';
 
 dotenv.config({ path: './environments/local.env' });
@@ -16,7 +16,7 @@ dotenv.config({ path: './environments/local.env' });
 const awsConfig = getConfigs().aws;
 
 export class GoodsResponseMapper {
-  public static toResponseDto(GoodsEntity: Partial<GoodsEntity>): CarListDto {
+  public static toResponseDto(GoodsEntity: Partial<GoodsEntity>): GoodListDto {
     return {
       id: GoodsEntity.id,
       user_id: GoodsEntity.user_id,
@@ -35,7 +35,7 @@ export class GoodsResponseMapper {
   }
   public static toResponseDtoViews(
     GoodsEntity: Partial<GoodsEntity>,
-  ): CarListPremDto {
+  ): GoodListPremDto {
     return {
       id: GoodsEntity.id,
       created: GoodsEntity.created,
@@ -54,29 +54,29 @@ export class GoodsResponseMapper {
     };
   }
   public static toResponseManyDto(
-    carEntity: Partial<GoodsEntity[]>,
+    goodEntity: Partial<GoodsEntity[]>,
     total: number,
     query: GoodsListRequestDto,
-  ): CarsResponseDto {
+  ): GoodsResponseDto {
     return {
-      data: carEntity?.map(this.toResponseDto),
+      data: goodEntity?.map(this.toResponseDto),
       total: total,
       limit: query.limit,
       offset: query.offset,
     };
   }
   public static responseDtoForMany(
-    carEntity: Partial<GoodsEntity[]>,
-  ): CarListDto[] {
-    return carEntity?.map(this.toResponseDto);
+    goodsEntities: Partial<GoodsEntity[]>,
+  ): GoodListDto[] {
+    return goodsEntities?.map(this.toResponseDto);
   }
   public static PremResponseManyDto(
-    carEntity: Partial<GoodsEntity[]>,
+    goodEntity: Partial<GoodsEntity[]>,
     total: number,
     query: GoodsListRequestDto,
-  ): CarsResponseDto {
+  ): GoodsResponseDto {
     return {
-      data: carEntity?.map(this.toResponseDtoViews),
+      data: goodEntity?.map(this.toResponseDtoViews),
       total: total,
       limit: query.limit,
       offset: query.offset,

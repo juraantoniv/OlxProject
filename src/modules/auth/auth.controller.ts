@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Header,
   Param,
   Post,
   UploadedFile,
@@ -10,8 +11,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
-  ApiConsumes,
-  ApiOperation, ApiTags,
+  ApiBody,
+  ApiConsumes, ApiHeader,
+  ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -29,13 +32,17 @@ import {
   AuthUserResponseDto,
   AuthUserResponseTokensDto,
 } from './dto/response/auth-user.response.dto';
-import { TokenResponseDto } from './dto/response/token.responce.dto';
+import {
+  AccessTokenDto,
+  TokenResponseDto,
+} from './dto/response/token.responce.dto';
 import { JwtRefreshGuard } from './guards/jwt.refresh.guard';
 import { IUserData } from './interfaces/user-data.interface';
 import { AuthService } from './services/auth.service';
 import { CreateUserDto } from '../user/dto/request/create-user.dto';
 import { BannedAccessGuard } from './guards/banned.access.guard';
 import { TokensRequestDto } from './dto/request/tokens.request.dto';
+import { CreateGoodDto } from '../goods/dto/request/create-good.dto';
 
 @ApiTags('Auth')
 @Controller({ path: 'auth', version: '1' })
@@ -74,8 +81,12 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Logout' })
   @Post('logout')
+  @ApiHeader({
+    name: 'access_token',
+    description: 'pass value of token to header',
+    required: true,
+  })
   public async logout(@CurrentUser() userData: IUserData): Promise<void> {
     await this.authService.logout(userData);
   }
