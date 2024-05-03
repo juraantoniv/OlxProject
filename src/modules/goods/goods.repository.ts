@@ -19,7 +19,7 @@ export class GoodsRepository extends Repository<GoodsEntity> {
     qb.leftJoinAndSelect('goods.user', 'user');
     qb.leftJoinAndSelect('goods.likes', 'likes');
     qb.leftJoinAndSelect('goods.views', 'views');
-    // qb.where('goods.active = :active', { active: 'active' });
+    qb.where('goods.active = :active', { active: 'active' });
 
     if (query.category) {
       qb.where('goods.category = :category', { category: query.category });
