@@ -6,6 +6,7 @@ export class StaticsEntity {
 export class StaticsResponseDto {
   value: string;
   label: string;
+  id: string;
 }
 
 export class StaticsMapper {
@@ -13,6 +14,7 @@ export class StaticsMapper {
     return {
       label: entity.goods_region,
       value: entity.sum,
+      id: crypto.randomUUID(),
     };
   }
 
