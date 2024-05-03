@@ -157,4 +157,15 @@ export class GoodsController {
   ) {
     return this.goodsService.favoriteGoods(userData.userId, query);
   }
+
+  @Get('statics/all')
+  @ApiOperation({ summary: 'get all goods with statics' })
+  // @RightsDecorator(ERights.Admin)
+  // @UseGuards(UserAccessGuard)
+  public async getStatics(
+    @Query() query: GoodsListRequestDto,
+    @CurrentUser() userData: IUserData,
+  ) {
+    return await this.goodsService.findStatics(query);
+  }
 }

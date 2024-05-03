@@ -74,4 +74,11 @@ export class GoodsRepository extends Repository<GoodsEntity> {
   public async getAllGoods() {
     return await this.find();
   }
+  public async findStatics(query: GoodsListRequestDto) {
+    const qb = this.createQueryBuilder('goods');
+    qb.select('goods.region');
+    qb.addSelect('SUM(goods.price)', 'sum');
+    qb.select('goods.user_id');
+    return await qb.getRawMany();
+  }
 }

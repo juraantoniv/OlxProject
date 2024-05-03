@@ -96,6 +96,9 @@ export class GoodsService {
     }
     return GoodsResponseMapper.responseDtoForMany(goods);
   }
+  public async findStatics(query: GoodsListRequestDto) {
+    return this.goodsRepository.findStatics(query);
+  }
 
   public async findOne(id: string, userData: IUserData) {
     if (!userData) {
