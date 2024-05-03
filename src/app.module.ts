@@ -11,6 +11,8 @@ import { CustomConfigModule } from './common/config/config.module';
 import { GoodsModule } from './modules/goods/goods.module';
 import { RepositoryModule } from './repository/repository.module';
 import { PassportModule } from '@nestjs/passport';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './common/exeptions/global-exception.filter';
 
 @Module({
   imports: [
@@ -25,6 +27,14 @@ import { PassportModule } from '@nestjs/passport';
     ScheduleModule.forRoot(),
   ],
   controllers: [],
-  providers: [AppService, TasksService, EmailService],
+  providers: [
+    AppService,
+    TasksService,
+    EmailService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}

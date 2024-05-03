@@ -6,37 +6,38 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import { HttpAdapterHost } from '@nestjs/core';
 
 @Catch()
-export class GlobalExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest<Request>();
+export class AllExceptionsFilter implements ExceptionFilter {
+  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
-    let status: HttpStatus;
+  catch(exception: unknown, host: ArgumentsHost): void {
+    const { httpAdapter } = this.httpAdapterHost;
+    const ctx = host.switchToHttp();
     let messages: string | string[];
+    const request = ctx.getRequest<Request>;
+
+    let httpStatus = null;
+
     if (exception instanceof HttpException) {
-      status = (exception as HttpException).getStatus();
+      httpStatus = exception.getStatus();
       messages = (exception as any).response?.message ?? exception.message;
     } else {
-      status = HttpStatus.INTERNAL_SERVER_ERROR;
+      httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
       messages = (exception as any).message;
     }
 
     messages = Array.isArray(messages) ? messages : [messages];
 
-    Logger.error(
-      messages,
-      (exception as any).stack,
-      `${request.method} ${request.url}`,
-    );
 
-    response.status().json({
-      statusCode: status,
-      messages,
+    const responseBody = {
+      statusCode: httpStatus,
       timestamp: new Date().toISOString(),
-      path: request.url,
-    });
+      path: httpAdapter.getRequestUrl(ctx.getRequest()),
+      messages: messages,
+    };
+
+    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }

@@ -5,7 +5,7 @@ import { SwaggerHelper } from './common/helpers/swagger.helper';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { AppConfig, Config } from './common/configs/config.type';
-import { GlobalExceptionFilter } from './common/exeptions/global-exception.filter';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -42,7 +42,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalFilters(new GlobalExceptionFilter());
+  // app.useGlobalFilters(new GlobalExceptionFilter());
 
   const configService = app.get(ConfigService<Config>);
   const appConfig = configService.get<AppConfig>('app');
