@@ -15,21 +15,25 @@ export class GoodsRepository extends Repository<GoodsEntity> {
     query: GoodsListRequestDto,
     userData: IUserData,
   ): Promise<[GoodsEntity[], number]> {
+    console.log(query.search_field);
     const qb = this.createQueryBuilder('goods');
     qb.leftJoinAndSelect('goods.user', 'user');
     qb.leftJoinAndSelect('goods.likes', 'likes');
     qb.leftJoinAndSelect('goods.views', 'views');
-    qb.where('goods.active = :active', { active: 'active' });
+    // qb.where('goods.active = :active', { active: 'active' });
 
     if (query.category) {
       qb.where('goods.category = :category', { category: query.category });
     }
+    if (query.region) {
+      qb.where('goods.region = :region', { region: query.region });
+    }
 
     if (query.search_field) {
+      console.log(query.search_field);
       qb.andWhere(
-        'CONCAT(LOWER(goods.region), LOWER(goods.location)) LIKE :search',
+        'CONCAT(LOWER(goods.title), LOWER(goods.description)) LIKE :search',
       );
-      qb.setParameter('search', `%${query.search_field.toLowerCase()}%`);
     }
 
     if (query.maxValue && query.minValue) {
@@ -51,6 +55,7 @@ export class GoodsRepository extends Repository<GoodsEntity> {
     }
     qb.setParameter('min', query.minValue);
     qb.setParameter('max', query.maxValue);
+    qb.setParameter('search', `%${query?.search_field?.toLowerCase()}%`);
     qb.addOrderBy('goods.price', query.ORDER);
     qb.take(query.limit);
     qb.skip(query.offset);
@@ -79,6 +84,14 @@ export class GoodsRepository extends Repository<GoodsEntity> {
     qb.select('goods.region');
     qb.addSelect('SUM(goods.price)', 'sum');
     qb.groupBy('goods.region');
+    return await qb.getRawMany();
+  }
+
+  public async findViews() {
+    const qb = this.createQueryBuilder('goods');
+    qb.select('goods.category');
+    qb.addSelect('SUM(goods.price)', 'views');
+    qb.groupBy('goods.category');
     return await qb.getRawMany();
   }
 }

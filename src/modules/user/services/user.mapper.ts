@@ -12,6 +12,7 @@ export class UserMapper {
   public static toResponseDto(user: Partial<UserEntity>): UserResponseDto {
     return {
       id: user.id,
+      phone: user.phone,
       email: user.email,
       name: user.name,
       created: user.created,
@@ -19,6 +20,7 @@ export class UserMapper {
       age: user.age,
       city: user.city,
       role: user.role,
+      active: user.active,
       messages: user.messages,
       sendedMessages: user.sendedMessages,
     };

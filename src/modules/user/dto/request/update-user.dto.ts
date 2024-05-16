@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsInt,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   Length,
   Max,
@@ -27,6 +28,9 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @Min(16)
   @Max(99)
   age: number;
+
+  @IsPhoneNumber('UA')
+  phone: string;
 
   @IsEnum(EUserBanned)
   active: EUserBanned;

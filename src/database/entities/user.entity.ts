@@ -29,7 +29,7 @@ export class UserEntity extends BaseEntity {
   age: number;
 
   @Column('text', { nullable: true })
-  phone: number;
+  phone: string;
 
   @Column('text', { nullable: true })
   city: string;

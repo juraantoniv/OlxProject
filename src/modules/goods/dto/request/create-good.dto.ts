@@ -32,9 +32,6 @@ export class CreateGoodDto {
 
   @IsString()
   description: string;
-
-  @ApiProperty({ type: 'string', format: 'binary' })
-  file: Express.Multer.File;
 }
 
 export class FileUploadDto {

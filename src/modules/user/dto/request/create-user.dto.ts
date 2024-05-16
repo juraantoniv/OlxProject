@@ -1,9 +1,10 @@
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IS_UUID,
   IsEmail,
   IsInt,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   IsUUID,
   Length,
@@ -23,14 +24,17 @@ export class CreateUserDto {
   @Transform(({ value }) => value.trim())
   email: string;
 
+  @IsPhoneNumber('UA')
+  phone: any;
+
   @IsString()
   @Transform(({ value }) => value.trim())
   password: string;
 
-  // @IsInt()
-  // @Min(16)
-  // @Max(99)
-  @IsString()
+  @IsInt()
+  @Min(16)
+  @Max(99)
+  @Type(() => Number)
   age: number;
 
   @IsString()

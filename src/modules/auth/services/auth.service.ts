@@ -72,15 +72,25 @@ export class AuthService {
       this.userRepository.create({ ...dto, password: hashedPassword }),
     );
 
-    const filePath = await this.s3Serv.uploadFile(
-      file,
-      EFileTypes.User,
-      user.id,
-    );
+    if (file) {
+      const filePath = await this.s3Serv.uploadFile(
+        file,
+        EFileTypes.User,
+        user.id,
+      );
+      const userAfterUpdateAvatar = this.userRepository.merge(user, {
+        ...user,
+        avatar: filePath,
+        role: manager ? ERights.Manager : ERights.Costumer,
+      });
+
+      await this.userRepository.save(userAfterUpdateAvatar);
+      return AuthMapper.toResponseDto(userAfterUpdateAvatar);
+    }
 
     const userAfterUpdateAvatar = this.userRepository.merge(user, {
       ...user,
-      avatar: filePath,
+      avatar: null,
       role: manager ? ERights.Manager : ERights.Costumer,
     });
 

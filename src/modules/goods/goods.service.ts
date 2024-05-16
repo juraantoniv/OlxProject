@@ -98,6 +98,8 @@ export class GoodsService {
     return GoodsResponseMapper.responseDtoForMany(goods);
   }
   public async findStatics(query: GoodsListRequestDto) {
+    const log = await this.goodsRepository.findViews();
+    console.log(log);
     return StaticsMapper.toResponseDtoForMany(
       await this.goodsRepository.findStatics(query),
     );
@@ -154,7 +156,7 @@ export class GoodsService {
       throw new ForbiddenException('You cant delete a good that not your own');
     }
 
-    await this.s3Serv.deleteFile(good.image);
+    // await this.s3Serv.deleteFile(good.image);
     await this.goodsRepository.remove(good);
   }
   public async like(id: string, userData: IUserData) {

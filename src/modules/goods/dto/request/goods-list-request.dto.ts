@@ -33,6 +33,12 @@ export class GoodsListRequestDto {
   @IsOptional()
   category?: string;
 
+
+  @Type(() => String)
+  @IsString()
+  @IsOptional()
+  region?: string;
+
   @Type(() => Number)
   @IsInt()
   @Min(0)
