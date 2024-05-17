@@ -22,16 +22,20 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   name: string;
   @IsString()
   @Transform(({ value }) => value.trim())
+  @IsOptional()
   city: string;
 
   @IsInt()
   @Min(16)
   @Max(99)
+  @IsOptional()
   age: number;
 
   @IsPhoneNumber('UA')
+  @IsOptional()
   phone: string;
 
   @IsEnum(EUserBanned)
+  @IsOptional()
   active: EUserBanned;
 }

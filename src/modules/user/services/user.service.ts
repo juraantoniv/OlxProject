@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, Logger, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 
 import { ERights, EUserBanned } from '../../../common/enums/users.rights.enum';
 import { EFileTypes, S3Service } from '../../../common/services/s3.service';
@@ -51,8 +56,7 @@ export class UserService {
 
   public async update(updateUserDto: UpdateUserDto, userData: IUserData) {
     const entity = await this.findUserByIdOrException(userData.userId);
-    this.userRepository.merge(entity, updateUserDto);
-    return await this.userRepository.save(entity);
+    return await this.userRepository.save({ ...entity, ...updateUserDto });
   }
   public async updateByAdmin(id: string, updateUserDto: UpdateUserDto) {
     const entity = await this.findUserByIdOrException(id);
