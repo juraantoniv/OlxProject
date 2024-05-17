@@ -92,11 +92,17 @@ export class GoodsController {
     return await this.goodsService.findMyGoods(query, userData);
   }
 
-  @UseGuards(BannedAccessGuard)
+  @SkipAuth()
   @ApiOperation({ summary: 'get a user goods by id' })
   @Get('user/:id')
   public async getUserGoodsById(@Param('id', ParseUUIDPipe) id: string) {
     return await this.goodsService.findUserGoodsById(id);
+  }
+
+  @ApiOperation({ summary: 'buy prem account' })
+  @Post('user/buyPrem')
+  public async buyPremAccount(@CurrentUser() userData: IUserData) {
+    return await this.goodsService.buyPremAccount(userData);
   }
 
   @ApiOperation({ summary: 'update users good' })
@@ -150,7 +156,7 @@ export class GoodsController {
 
   @Get('favorite/my')
   @ApiOperation({ summary: 'get favorite  users list' })
-  @UseGuards(UserAccessGuard, BannedAccessGuard)
+  @UseGuards(UserAccessGuard)
   myFavorites(
     @CurrentUser() userData: IUserData,
     @Query() query: GoodsListRequestDto,

@@ -11,7 +11,7 @@ export class GoodsListRequestDto {
 
   @Type(() => Number)
   @IsInt()
-  @Min(1)
+  @Min(0)
   @Max(99999)
   @IsOptional()
   minValue?: number;

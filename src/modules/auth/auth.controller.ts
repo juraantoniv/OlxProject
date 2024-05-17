@@ -63,7 +63,6 @@ export class AuthController {
 
   @SkipAuth()
   @ApiOperation({ summary: 'Login' })
-  @UseGuards(BannedAccessGuard)
   @Post('sign-in')
   public async signIn(
     @Body() dto: SignInRequestDto,

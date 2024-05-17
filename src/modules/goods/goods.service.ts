@@ -1,5 +1,4 @@
 import { ForbiddenException, Injectable, Query } from '@nestjs/common';
-import axios from 'axios';
 
 import { EEmailAction } from '../../common/enums/email.action.enum';
 import { ERights, EType } from '../../common/enums/users.rights.enum';
@@ -12,7 +11,7 @@ import { IUserData } from '../auth/interfaces/user-data.interface';
 import { UserRepository } from '../user/user.repository';
 import { GoodsRepository } from './goods.repository';
 import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
-import { CreateGoodDto, FileUploadDto } from './dto/request/create-good.dto';
+import { CreateGoodDto } from './dto/request/create-good.dto';
 import { UpdateGoodDto } from './dto/request/update-good.dto';
 import { GoodsResponseMapper } from './services/goods.responce.mapper';
 import { GoodsEntity } from '../../database/entities/goods.entity';
@@ -96,6 +95,14 @@ export class GoodsService {
       throw new ForbiddenException('Not found');
     }
     return GoodsResponseMapper.responseDtoForMany(goods);
+  }
+  public async buyPremAccount(userData: IUserData) {
+    const user = await this.userRepository.findOneBy({ id: userData.userId });
+
+    await this.userRepository.save({
+      ...user,
+      userPremiumRights: EType.Premium,
+    });
   }
   public async findStatics(query: GoodsListRequestDto) {
     const log = await this.goodsRepository.findViews();

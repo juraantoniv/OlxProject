@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiHeader,
@@ -41,6 +49,15 @@ export class UserController {
     @CurrentUser() userData: IUserData,
   ) {
     return await this.userService.update(updateUserDto, userData);
+  }
+  @ApiOperation({ summary: 'update user by id' })
+  @ApiBearerAuth()
+  @Patch('update/:id')
+  public async updateById(
+    @Body() updateUserDto: UpdateUserDto,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return await this.userService.updateByAdmin(id, updateUserDto);
   }
   @ApiOperation({ summary: 'get me' })
   @ApiBearerAuth()
