@@ -249,7 +249,7 @@ export class GoodsService {
 
   public async favoriteGoods(
     userId: string,
-    @Query() query: GoodsListRequestDto,
+    query: GoodsListRequestDto,
   ) {
     const [goods, total] = await this.goodsRepository
       .createQueryBuilder('goods')
