@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { GoodsRepository } from '../../modules/goods/goods.repository';
-import { UserRepository } from '../../modules/user/user.repository';
+import { UserRepository } from '../../repository/services/user.repository';
 import { EmailService } from '../services/email.service';
 import { EActive } from '../enums/valiid.enum';
 import { checkWordsService } from '../services/check.worlds.service';

@@ -11,7 +11,7 @@ import { UserEntity } from '../../../database/entities/user.entity';
 import { IUserData } from '../../auth/interfaces/user-data.interface';
 import { CreateUserDto } from '../dto/request/create-user.dto';
 import { UpdateUserDto } from '../dto/request/update-user.dto';
-import { UserRepository } from '../user.repository';
+import { UserRepository } from '../../../repository/services/user.repository';
 import { UserMapper } from './user.mapper';
 import { GoodsRepository } from '../../goods/goods.repository';
 import { MessageRepository } from '../../../repository/services/message.repository';

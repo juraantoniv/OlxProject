@@ -9,7 +9,7 @@ import {
 import { Reflector } from '@nestjs/core';
 
 import { RefreshTokenRepository } from '../../../repository/services/refresh-token.repository';
-import { UserRepository } from '../../user/user.repository';
+import { UserRepository } from '../../../repository/services/user.repository';
 import { TokenService } from '../services/token.service';
 
 @Injectable()

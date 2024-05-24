@@ -8,7 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 import { GoodsController } from './goods.controller';
 import { GoodsRepository } from './goods.repository';
 import { GoodsService } from './goods.service';
-import { UserRepository } from '../user/user.repository';
+import { UserRepository } from '../../repository/services/user.repository';
 
 @Module({
   imports: [AuthModule],

@@ -17,7 +17,7 @@ import { EFileTypes, S3Service } from '../../../common/services/s3.service';
 import { UserEntity } from '../../../database/entities/user.entity';
 import { RefreshTokenRepository } from '../../../repository/services/refresh-token.repository';
 import { CreateUserDto } from '../../user/dto/request/create-user.dto';
-import { UserRepository } from '../../user/user.repository';
+import { UserRepository } from '../../../repository/services/user.repository';
 import {
   ChangePasswordRequestDto,
   ConfirmPasswordRequestDto,

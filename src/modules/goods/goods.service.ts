@@ -8,7 +8,7 @@ import { UserEntity } from '../../database/entities/user.entity';
 import { LikeRepository } from '../../repository/services/like.repository';
 import { ViewsRepository } from '../../repository/services/views.repository';
 import { IUserData } from '../auth/interfaces/user-data.interface';
-import { UserRepository } from '../user/user.repository';
+import { UserRepository } from '../../repository/services/user.repository';
 import { GoodsRepository } from './goods.repository';
 import { GoodsListRequestDto } from './dto/request/goods-list-request.dto';
 import { CreateGoodDto } from './dto/request/create-good.dto';

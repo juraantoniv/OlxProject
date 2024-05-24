@@ -8,7 +8,7 @@ import { log } from 'console';
 
 import { TokenType } from '../../../common/enums/token.enum';
 import { RefreshTokenRepository } from '../../../repository/services/refresh-token.repository';
-import { UserRepository } from '../../user/user.repository';
+import { UserRepository } from '../../../repository/services/user.repository';
 import { TokenService } from '../services/token.service';
 
 @Injectable()
